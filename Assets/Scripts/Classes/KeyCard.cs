@@ -21,13 +21,11 @@ namespace CodeNames
             size = size;
 
             string[] d = data_string.Split(',');
-            Debug.Log(d);
             for (int i = 0; i < d.Length; i++)
             {
                 int n = Int32.Parse(d[i].Trim());
                 CardColor color = (CardColor)Enum.ToObject(typeof(CardColor), n);
                 data.Add(color);
-                Debug.Log(color);
             }
         }
     }
