@@ -4,8 +4,12 @@ using Mono.Data.Sqlite;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using CodeNames;
 
-public class SqliteController : MonoBehaviour
+namespace CodeNames
+{
+
+public class SqliteDataLoader : MonoBehaviour
 {
     [SerializeField]
     public bool LoadVocabulary = false;
@@ -20,12 +24,6 @@ public class SqliteController : MonoBehaviour
         if(LoadKeys){
             LoadKeyFiles();
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     void LoadVocab(){
@@ -88,28 +86,18 @@ public class SqliteController : MonoBehaviour
         createCmd.CommandText = q_createTable;
         createCmd.ExecuteReader();
 
-        keyCard _keyCard = new keyCard();
+        KeyCard _keyCard = new KeyCard();
         foreach(string file in files){
             if(file.Contains(".meta")){
                 continue;
             }
 
-            _keyCard = JsonUtility.FromJson<keyCard>(File.ReadAllText(Path.Combine(new string[] {Application.dataPath, "Data", "keys", file})));
+            _keyCard = JsonUtility.FromJson<KeyCard>(File.ReadAllText(Path.Combine(new string[] {Application.dataPath, "Data", "keys", file})));
             IDbCommand cmnd = dbcon.CreateCommand();
-            cmnd.CommandText = $"INSERT INTO keys (id, firstToMove, data, redCount, blueCount, blackCount, size) VALUES ({_keyCard.id}, {_keyCard.firstToMove}, '{string.Join(", ", _keyCard.data)}', {_keyCard.redCount}, {_keyCard.blueCount}, {_keyCard.blackCount}, {_keyCard.size});";
+            cmnd.CommandText = $"INSERT INTO keys (id, firstToMove, data, size) VALUES ({_keyCard.id}, {_keyCard.firstToMove}, '{string.Join(", ", _keyCard.data)}', {_keyCard.size});";
             cmnd.ExecuteNonQuery();
         }
     }
 }
-
-[System.Serializable]
-public class keyCard{
-    public int id;
-    public int firstToMove;
-    public int[] data;
-    public int redCount;
-    public int blueCount;
-    public int blackCount;
-    public int size;
 
 }
