@@ -8,6 +8,8 @@ namespace CodeNames
     {
         Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
         KeyCard keyCard;
+        int CardsToWinTeamRed;
+        int CardsToWinTeamBlue;
 
         private static GameStateManager instance = null;
         public delegate void OnStateChangeHandler();
@@ -28,21 +30,47 @@ namespace CodeNames
 
         protected GameStateManager()
         {
-            Debug.Log("Pulling Cards for the Deck");
             LoadKeyCardFromDB();
             LoadDeckFromDB();
+            InitializeScore();
+        }
+
+        protected void InitializeScore()
+        {
+            Debug.Log("Initializing Score...");
+            Debug.Assert(keyCard.data.Count == deck.Count);
+            CardsToWinTeamRed = 0;
+            CardsToWinTeamBlue = 0;
+
+            for (int i = 0; i < keyCard.data.Count; i++)
+            {
+                if (keyCard.data[i] == CardColor.Red)
+                {
+                    CardsToWinTeamRed += 1;
+                }
+                else if (keyCard.data[i] == CardColor.Blue)
+                {
+                    CardsToWinTeamBlue += 1;
+                }
+            }
+
+            Debug.Log("Cards Left to Win...");
+            Debug.Log("Red: " + CardsToWinTeamRed.ToString());
+            Debug.Log("Blue: " + CardsToWinTeamBlue.ToString());
         }
 
         protected void LoadKeyCardFromDB()
         {
+            Debug.Log("Drawing KeyCard");
             deck = new Deck();
             keyCard = SqliteApi.GetRandomKeyCard();
         }
 
         protected void LoadDeckFromDB()
         {
+            Debug.Log("Drawing Cards for the Deck");
             deck = new Deck();
-            List<string> words = SqliteApi.GetRandomWords25();
+            List<string> words = SqliteApi.GetRandomWords();
             for (int i = 0; i < words.Count; i++)
             {
                 deck.Add(new Card(words[i]));

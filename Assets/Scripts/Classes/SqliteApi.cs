@@ -41,12 +41,12 @@ namespace CodeNames
             return keyCard;
         }
 
-        public static List<string> GetRandomWords25()
+        public static List<string> GetRandomWords()
         {
             IDbConnection dbcon = new SqliteConnection(connectionString);
             dbcon.Open();
             IDbCommand dbcmd = dbcon.CreateCommand();
-            dbcmd.CommandText = Constants.GET_25_RANDOM_WORDS_SQL;
+            dbcmd.CommandText = Constants.GET_RANDOM_WORDS_SQL;
             IDataReader reader = dbcmd.ExecuteReader();
 
             List<string> words = new List<string>();
