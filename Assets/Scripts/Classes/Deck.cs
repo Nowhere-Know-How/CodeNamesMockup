@@ -21,7 +21,7 @@ namespace CodeNames
             get { return cards.Count; }
         }
 
-        public Card DrawCard()
+        public Card DealCard()
         {
             Card firstCard = cards[0];
             cards.RemoveAt(0);
@@ -37,7 +37,7 @@ namespace CodeNames
 
         public void ResetDeck()
         {
-            cards = allCards;
+            cards = new List<Card>(allCards);
         }
     }
 }

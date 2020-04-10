@@ -28,5 +28,10 @@ namespace CodeNames
                 data.Add(color);
             }
         }
+
+        public CardColor GetCardColor(int index)
+        {
+            return data[index];
+        }
     }
 }

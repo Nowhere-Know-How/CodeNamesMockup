@@ -12,9 +12,9 @@ namespace CodeNames
         int CardsToWinTeamBlue;
 
         private static GameStateManager instance = null;
-        public delegate void OnStateChangeHandler();
-        public event OnStateChangeHandler OnStateChange;
-        public GameStates gameState { get; private set; }
+        //public delegate void OnStateChangeHandler();
+        //public event OnStateChangeHandler OnStateChange;
+        //public GameStates gameState { get; private set; }
 
         public static GameStateManager Instance
         {
@@ -27,6 +27,16 @@ namespace CodeNames
                 return GameStateManager.instance;
             }
         }
+        
+        //public void SetGameState(GameStates state)
+        //{
+        //    this.gameState = state;
+        //    OnStateChange();
+        //}
+        //public void OnApplicationQuit()
+        //{
+        //    GameStateManager.instance = null;
+        //}
 
         protected GameStateManager()
         {
@@ -54,11 +64,54 @@ namespace CodeNames
                 }
             }
 
-            Debug.Log("Cards Left to Win...");
-            Debug.Log("Red: " + CardsToWinTeamRed.ToString());
-            Debug.Log("Blue: " + CardsToWinTeamBlue.ToString());
+            Debug.Log("Cards Left to Win: " + "\nRed - " + CardsToWinTeamRed.ToString() + ", Blue - " + CardsToWinTeamBlue.ToString());
         }
 
+        public RevealCardResolutions RevealCard(int index) //Reveals the card at the index of the deck
+        {
+            try
+            {
+                if (deck.Cards[index].State == CardState.Revealed){
+                    return RevealCardResolutions.ALREADY_REVEALED;
+                }
+                else{
+                    deck.Cards[index].State = CardState.Revealed;
+                    CardColor cardColor = keyCard.data[index];
+                    switch (cardColor)
+                    {
+                        case CardColor.Red:
+                            return RevealCardResolutions.REVEALED_RED_TEAM_CARD;
+                        case CardColor.Blue:
+                            return RevealCardResolutions.REVEALED_BLUE_TEAM_CARD;
+                        case CardColor.Brown:
+                            return RevealCardResolutions.REVEALED_BROWN_TEAM_CARD;
+                        case CardColor.Black:
+                            return RevealCardResolutions.REVEALED_BLACK_TEAM_CARD;
+                        default:
+                            throw new System.Exception("RevealCardResolutions not implemented: " + cardColor);
+                    }
+                }
+            }
+            catch
+            {
+                return RevealCardResolutions.ERROR;
+            }
+
+        }
+
+        public KeyCard KeyCard
+        {
+            get { return keyCard; }
+        }
+        public void DrawNewDeck()
+        {
+            LoadDeckFromDB();
+        }
+
+        public Deck Deck
+        {
+            get { return deck; }
+        }
         protected void LoadKeyCardFromDB()
         {
             Debug.Log("Drawing KeyCard");
@@ -77,26 +130,6 @@ namespace CodeNames
             }
         }
 
-        public void DrawNewDeck()
-        {
-            LoadDeckFromDB();
-        }
-
-        public Deck Deck
-        {
-            get { return deck; }
-        }
-
-        public void SetGameState(GameStates state)
-        {
-            this.gameState = state;
-            OnStateChange();
-        }
-
-        public void OnApplicationQuit()
-        {
-            GameStateManager.instance = null;
-        }
-
+        
     }
 }
