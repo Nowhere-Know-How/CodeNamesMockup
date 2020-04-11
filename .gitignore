@@ -1,5 +1,6 @@
 /Assets/Data
 
+.collabignore
 /.vscode/
 /.vs/
 /bin/
