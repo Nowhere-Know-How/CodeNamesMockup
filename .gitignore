@@ -1,5 +1,9 @@
 /Assets/Data
 
+/.vscode/
+/.vs/
+/bin/
+
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
@@ -11,8 +15,6 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
-
-/bin/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
