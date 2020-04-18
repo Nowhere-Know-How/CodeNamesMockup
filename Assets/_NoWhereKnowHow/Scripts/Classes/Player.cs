@@ -2,19 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+[System.Serializable]
+public class Player
 {
-    string playerName;
-    string prefabString;
+    public string playerName;
+    public string prefabString;
 
-    public string PlayerName {
-        get { return playerName; } 
-        set { playerName = value; } 
+    public Player(string name, string prefab)
+    {
+        playerName = name;
+        prefab = prefabString;
     }
 
-    public string PrefabString {
-        get { return prefabString; } 
-        set { prefabString = value; } 
+    public string PlayerName
+    {
+        get { return playerName; }
+        set { playerName = value; }
     }
-    
+
+    public string PrefabString
+    {
+        get { return prefabString; }
+        set { prefabString = value; }
+    }
+
 }

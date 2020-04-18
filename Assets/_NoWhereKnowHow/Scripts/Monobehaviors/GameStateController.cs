@@ -8,44 +8,70 @@ namespace CodeNames
     // Emits GameStates Events
     public class GameStateController : SingletonBehaviour<GameStateController>
     {
-        GameStateManager GM;
         GameState gameState;
+        float waitTime = 5f;
+        float waitEndTime = 0f;
 
-
-        void Start()
+        private void Start()
         {
-            GM = GameStateManager.Instance;
+            GameStateManager.InitEventListeners();
+            EventManager.onGameStateChange.Invoke(gameState);
         }
 
         private void Update()
-        {            
-            if (Input.GetKeyDown(KeyCode.N))
+        {
+            if (gameState == GameState.INIT && GameStateManager.IsGameDataInited)
             {
+                gameState = GameState.PICK_TEAMS;
                 EventManager.onGameStateChange.Invoke(gameState);
-                Debug.Log("INIT");
             }
-            // if (Input.GetKeyDown(KeyCode.X))
-            // {
-            //     Card card = GM.Deck.DealCard();
-            //     Debug.Log("Draw Card. Info: Text -" + card.Text + ", State - " + card.State);
-            // }
-            // if (Input.GetKeyDown(KeyCode.C))
-            // {
-            //     GM.Deck.ResetDeck();
-            //     Debug.Log("Reset Deck");
-            // }
-            // if (Input.GetKeyDown(KeyCode.R))
-            // {
-            //     GM.DrawNewDeck();
-            //     Debug.Log("Redraft Deck");
-            // }
-            // if (Input.GetKeyDown(KeyCode.V))
-            // {
-            //     int index = 0;
-            //     GM.RevealCard(index);
-            //     Card card = GM.Deck.DealCard();
-            //     Debug.Log("Draw Card. Info: Text -" + card.Text + ", State - " + card.State + ", CardColor - " + GM.KeyCard.GetCardColor(index).ToString());
-            // }
+            else if (gameState == GameState.PICK_TEAMS && GameStateManager.IsTeamsPicked)
+            {
+                gameState = GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER;
+                waitEndTime = Time.time + waitTime;
+                EventManager.onGameStateChange.Invoke(gameState);
+            }
+            else if (gameState == GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER && Time.time > waitEndTime)
+            {
+                if (GameStateManager.TeamWithFirstTurn == CardColor.Red)
+                {
+                    gameState = GameState.RED_TEAM_TURN;
+                }
+                else
+                {
+                    gameState = GameState.BLUE_TEAM_TURN;
+                }
+                EventManager.onGameStateChange.Invoke(gameState);
+            }
+
+
+            //if (Input.GetKeyDown(KeyCode.N))
+            //{
+            //    Debug.Log("Invoke");
+            //    EventManager.onGameStateChange.Invoke(gameState);
+            //}
+            //if (Input.GetKeyDown(KeyCode.X))
+            //{
+            //    Card card = GameStateManager.Deck.DealCard();
+            //    Debug.Log("Draw Card. Info: Text -" + card.Text + ", State - " + card.State);
+            //}
+            //if (Input.GetKeyDown(KeyCode.C))
+            //{
+            //    GameStateManager.Deck.ResetDeck();
+            //    Debug.Log("Reset Deck");
+            //}
+            //if (Input.GetKeyDown(KeyCode.R))
+            //{
+            //    GameStateManager.DrawNewDeck();
+            //    Debug.Log("Redraft Deck");
+            //}
+            //if (Input.GetKeyDown(KeyCode.V))
+            //{
+            //    int index = 0;
+            //    GameStateManager.RevealCard(index);
+            //    Card card = GameStateManager.Deck.DealCard();
+            //    Debug.Log("Draw Card. Info: Text -" + card.Text + ", State - " + card.State + ", CardColor - " + GameStateManager.KeyCard.GetCardColor(index).ToString());
+            //}
         }
     }
 }

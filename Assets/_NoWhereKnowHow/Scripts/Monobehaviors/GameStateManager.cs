@@ -4,44 +4,111 @@ using CodeNames;
 
 namespace CodeNames
 {
-    // Listens for GameStates Events
-    public class GameStateManager : Object
+    public class GameStateManager
     {
-        Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
-        KeyCard keyCard;
-        int CardsToWinTeamRed;
-        int CardsToWinTeamBlue;
+        static Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
+        static KeyCard keyCard;
+        static int CardsToWinTeamRed;
+        static int CardsToWinTeamBlue;
 
-        private static GameStateManager instance = null;
+        static Team redTeam = new Team();
+        static Team blueTeam = new Team();
+        static CardColor teamWithFirstTurn;
+        static int minPlayersRequired = 4;
 
-        public static GameStateManager Instance
+        static bool isGameDataInited = false;
+        static bool isEventListenersInited = false;
+        static bool isTeamsPicked = false;
+        
+        public static bool IsGameDataInited
         {
-            get
+            get { return isGameDataInited; }
+        }
+        public static bool IsTeamsPicked
+        {
+            get { return isTeamsPicked; }
+        }
+        public static CardColor TeamWithFirstTurn
+        {
+            get { return teamWithFirstTurn; }
+        }
+
+
+        public static void InitEventListeners()
+        {
+            if (!isEventListenersInited)
             {
-                if (GameStateManager.instance == null)
-                {
-                    GameStateManager.instance = new GameStateManager();
-                }
-                return GameStateManager.instance;
+                Debug.Log("Event Listeners Registered");
+                EventManager.onGameStateChange.AddListener(HandleStateChange);
+                isEventListenersInited = true;
             }
         }
-        
-        private void Init(GameState gameState){
-            Debug.Log("GameState: " + gameState.ToString());
-            LoadKeyCardFromDB();
-            LoadDeckFromDB();
-            InitializeScore();
-        }
-        
-        protected GameStateManager()
+
+        private GameStateManager()
         {
-            EventManager.onGameStateChange.AddListener(Init);
-
         }
 
+        private static void HandleStateChange(GameState gs)
+        {
+            Debug.Log("GAME STATE CHANGED: " + gs.ToString());
+            switch (gs)
+            {
+                #region GAMESTATE INIT
+                case GameState.INIT:
+                    LoadKeyCardFromDB();
+                    LoadDeckFromDB();
+                    InitializeScore();
+                    isGameDataInited = true;
+                    break;
+                #endregion
 
+                #region GAMESTATE PICK TEAMS
+                case GameState.PICK_TEAMS:
+                    Debug.Log("Players Online: " + PlayersInGame.online.Count.ToString());
+                    redTeam.Clear();
+                    blueTeam.Clear();
+                    if (PlayersInGame.online.Count < minPlayersRequired)
+                    {
+                        throw new System.NotImplementedException("CodeNames needs at least " + minPlayersRequired.ToString() + " people to play");
+                    }
 
-        protected void InitializeScore()
+                    PlayersInGame.ShufflePlayers();
+                    for (int i = 0; i < PlayersInGame.online.Count; i++)
+                    {
+                        if (i % 2 == 0)
+                        {
+                            redTeam.AddPlayer(PlayersInGame.online[i]);
+                        }
+                        else
+                        {
+                            blueTeam.AddPlayer(PlayersInGame.online[i]);
+                        }
+                    }
+
+                    redTeam.PickCodeMaster();
+                    blueTeam.PickCodeMaster();
+
+                    Debug.Log("Teams picked");
+                    Debug.Log("Red Team: " + redTeam.ToString());
+                    Debug.Log("Red CodeMaster: " + redTeam.CodeMaster.PlayerName);
+                    Debug.Log("Blue Team: " + blueTeam.ToString());
+                    Debug.Log("Blue CodeMaster: " + blueTeam.CodeMaster.PlayerName);
+                    isTeamsPicked = true;
+                    break;
+                #endregion
+
+                #region GAMESTATE WAIT
+                case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER:
+                    Debug.Log("Game State Manager is waiting...");
+                    break;
+                #endregion
+
+                default:
+                    throw new System.NotImplementedException("GameState Not Implemented: " + gs.ToString());
+            }
+        }
+
+        protected static void InitializeScore()
         {
             Debug.Log("Initializing Score...");
             Debug.Assert(keyCard.data.Count == deck.Count);
@@ -60,10 +127,23 @@ namespace CodeNames
                 }
             }
 
+            if (CardsToWinTeamBlue > CardsToWinTeamRed)
+            {
+                teamWithFirstTurn = CardColor.Blue;
+            }
+            else if (CardsToWinTeamBlue < CardsToWinTeamRed)
+            {
+                teamWithFirstTurn = CardColor.Red;
+            }
+            else
+            {
+                throw new System.DataMisalignedException("Cards To Win for both teams should never match at the beginning of the game");
+            }
+
             Debug.Log("Cards Left to Win: " + "\nRed - " + CardsToWinTeamRed.ToString() + ", Blue - " + CardsToWinTeamBlue.ToString());
         }
 
-        public RevealCardResolutions RevealCard(int index) //Reveals the card at the index of the deck
+        public static RevealCardResolutions RevealCard(int index) //Reveals the card at the index of the deck
         {
             try
             {
@@ -95,27 +175,27 @@ namespace CodeNames
 
         }
 
-        public KeyCard KeyCard
+        public static KeyCard KeyCard
         {
             get { return keyCard; }
         }
-        public void DrawNewDeck()
+        public static void DrawNewDeck()
         {
             LoadDeckFromDB();
         }
 
-        public Deck Deck
+        public static Deck Deck
         {
             get { return deck; }
         }
-        protected void LoadKeyCardFromDB()
+        protected static void LoadKeyCardFromDB()
         {
             Debug.Log("Drawing KeyCard");
             deck = new Deck();
             keyCard = SqliteApi.GetRandomKeyCard();
         }
 
-        protected void LoadDeckFromDB()
+        protected static void LoadDeckFromDB()
         {
             Debug.Log("Drawing Cards for the Deck");
             deck = new Deck();
