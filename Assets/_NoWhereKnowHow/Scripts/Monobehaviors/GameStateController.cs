@@ -42,12 +42,12 @@ namespace CodeNames
                     EventManager.onGameStateChange.Invoke(GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER);
                     break;
 
-                case GameState.RED_TEAM_TURN:
-                    Debug.Log("Red Team Turn");
+                case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_BLUE_TO_START:
+                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_START);
                     break;
 
-                case GameState.BLUE_TEAM_TURN:
-                    Debug.Log("Blue Team Turn");
+                case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_RED_TO_START:
+                    EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_START);
                     break;
 
                 default:

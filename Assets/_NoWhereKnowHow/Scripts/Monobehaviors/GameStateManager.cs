@@ -7,7 +7,8 @@ namespace CodeNames
 {
     public class GameStateManager : SingletonBehaviour<GameStateManager>
     {
-        public float waitTimeInSeconds = 5f;
+        public float waitTimeAfterTeamPick = 5f;
+        public float waitTimePerTeamTurn = 5f;
 
         Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
         KeyCard keyCard;
@@ -109,14 +110,30 @@ namespace CodeNames
                 #region GAMESTATE WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER
                 case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER:
                     Debug.Log("Game State Manager is waiting... ");
-                    if (teamWithFirstTurn == CardColor.Blue)
+                    if (teamWithFirstTurn == CardColor.Blue) 
                     {
-                        StartCoroutine(EventManager.DelayInvoke(waitTimeInSeconds, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN));
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamPick, EventManager.onGameStateChangeDone, GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_BLUE_TO_START));
                     }
-                    else //Red
+                    else if (teamWithFirstTurn == CardColor.Red)
                     {
-                        StartCoroutine(EventManager.DelayInvoke(waitTimeInSeconds, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN));
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamPick, EventManager.onGameStateChangeDone, GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_RED_TO_START));
                     }
+                    else
+                    {
+                        throw new System.NotSupportedException("A red or blue team must go first");
+                    }
+                    break;
+                #endregion
+
+                #region GAMESTATE BLUE_TEAM_TURN_START
+                case GameState.BLUE_TEAM_TURN_START:
+
+                    break;
+                #endregion
+
+                #region GAMESTATE RED_TEAM_TURN_START
+                case GameState.RED_TEAM_TURN_START:
+
                     break;
                 #endregion
 
