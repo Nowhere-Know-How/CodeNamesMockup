@@ -42,6 +42,6 @@ public class Team
         {
             playerNames.Add(players[i].playerName);
         }
-        return String.Join(",", playerNames.ToArray());
+        return String.Join(", ", playerNames.ToArray());
     }
 }

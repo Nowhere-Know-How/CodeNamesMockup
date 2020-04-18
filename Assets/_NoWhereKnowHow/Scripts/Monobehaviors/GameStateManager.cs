@@ -1,44 +1,51 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using CodeNames;
+using System.Collections;
 
 namespace CodeNames
 {
-    public class GameStateManager
+    public class GameStateManager : SingletonBehaviour<GameStateManager>
     {
-        static Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
-        static KeyCard keyCard;
-        static int CardsToWinTeamRed;
-        static int CardsToWinTeamBlue;
+        public float waitTimeInSeconds = 5f;
 
-        static Team redTeam = new Team();
-        static Team blueTeam = new Team();
-        static CardColor teamWithFirstTurn;
-        static int minPlayersRequired = 4;
+        Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
+        KeyCard keyCard;
+        int CardsToWinTeamRed;
+        int CardsToWinTeamBlue;
 
-        static bool isGameDataInited = false;
-        static bool isEventListenersInited = false;
-        static bool isTeamsPicked = false;
+        Team redTeam = new Team();
+        Team blueTeam = new Team();
+        CardColor teamWithFirstTurn;
+        int minPlayersRequired = 4;
+
+        bool isGameDataInited = false;
+        bool isEventListenersInited = false;
+        bool isTeamsPicked = false;
         
-        public static bool IsGameDataInited
+
+        public bool IsGameDataInited
         {
             get { return isGameDataInited; }
         }
-        public static bool IsTeamsPicked
+        public bool IsTeamsPicked
         {
             get { return isTeamsPicked; }
         }
-        public static CardColor TeamWithFirstTurn
+        public CardColor TeamWithFirstTurn
         {
             get { return teamWithFirstTurn; }
         }
+        void Awake()
+        {
+            InitEventListeners();
+        }
 
-
-        public static void InitEventListeners()
+        public void InitEventListeners()
         {
             if (!isEventListenersInited)
             {
-                Debug.Log("Event Listeners Registered");
+                Debug.Log("GameStateManager Event Listeners Registered");
                 EventManager.onGameStateChange.AddListener(HandleStateChange);
                 isEventListenersInited = true;
             }
@@ -48,7 +55,7 @@ namespace CodeNames
         {
         }
 
-        private static void HandleStateChange(GameState gs)
+        private void HandleStateChange(GameState gs)
         {
             Debug.Log("GAME STATE CHANGED: " + gs.ToString());
             switch (gs)
@@ -59,6 +66,7 @@ namespace CodeNames
                     LoadDeckFromDB();
                     InitializeScore();
                     isGameDataInited = true;
+                    EventManager.onGameStateChangeDone.Invoke(GameState.INIT_DONE);
                     break;
                 #endregion
 
@@ -94,12 +102,21 @@ namespace CodeNames
                     Debug.Log("Blue Team: " + blueTeam.ToString());
                     Debug.Log("Blue CodeMaster: " + blueTeam.CodeMaster.PlayerName);
                     isTeamsPicked = true;
+                    EventManager.onGameStateChangeDone.Invoke(GameState.PICK_TEAMS_DONE);
                     break;
                 #endregion
 
-                #region GAMESTATE WAIT
+                #region GAMESTATE WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER
                 case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER:
-                    Debug.Log("Game State Manager is waiting...");
+                    Debug.Log("Game State Manager is waiting... ");
+                    if (teamWithFirstTurn == CardColor.Blue)
+                    {
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeInSeconds, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN));
+                    }
+                    else //Red
+                    {
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeInSeconds, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN));
+                    }
                     break;
                 #endregion
 
@@ -108,7 +125,8 @@ namespace CodeNames
             }
         }
 
-        protected static void InitializeScore()
+
+        protected void InitializeScore()
         {
             Debug.Log("Initializing Score...");
             Debug.Assert(keyCard.data.Count == deck.Count);
@@ -143,7 +161,7 @@ namespace CodeNames
             Debug.Log("Cards Left to Win: " + "\nRed - " + CardsToWinTeamRed.ToString() + ", Blue - " + CardsToWinTeamBlue.ToString());
         }
 
-        public static RevealCardResolutions RevealCard(int index) //Reveals the card at the index of the deck
+        public RevealCardResolutions RevealCard(int index) //Reveals the card at the index of the deck
         {
             try
             {
@@ -175,27 +193,27 @@ namespace CodeNames
 
         }
 
-        public static KeyCard KeyCard
+        public KeyCard KeyCard
         {
             get { return keyCard; }
         }
-        public static void DrawNewDeck()
+        public void DrawNewDeck()
         {
             LoadDeckFromDB();
         }
 
-        public static Deck Deck
+        public Deck Deck
         {
             get { return deck; }
         }
-        protected static void LoadKeyCardFromDB()
+        protected void LoadKeyCardFromDB()
         {
             Debug.Log("Drawing KeyCard");
             deck = new Deck();
             keyCard = SqliteApi.GetRandomKeyCard();
         }
 
-        protected static void LoadDeckFromDB()
+        protected void LoadDeckFromDB()
         {
             Debug.Log("Drawing Cards for the Deck");
             deck = new Deck();

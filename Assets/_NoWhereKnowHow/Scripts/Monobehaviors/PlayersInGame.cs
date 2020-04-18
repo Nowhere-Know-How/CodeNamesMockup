@@ -7,7 +7,7 @@ public class PlayersInGame:MonoBehaviour
 {
     public static List<Player> online = new List<Player>();
 
-    private void Start()
+    private void Awake()
     {
         if (Environment.GetEnvironmentVariable("PRODUCTION") == "true")
         {
@@ -15,13 +15,13 @@ public class PlayersInGame:MonoBehaviour
         }
         else //development
         {
-            online.Add(new Player("Bob", "male1"));
+            online.Add(new Player("Arash", "male1"));
             online.Add(new Player("Josh", "female1"));
             online.Add(new Player("Brandon", "male2"));
             online.Add(new Player("Jessica", "female2"));
             online.Add(new Player("Helen", "female3"));
-            online.Add(new Player("Maki", "female4"));
-            online.Add(new Player("Roy", "female1"));
+            online.Add(new Player("Wei", "female4"));
+            online.Add(new Player("Bao", "female1"));
         }
     }
 
