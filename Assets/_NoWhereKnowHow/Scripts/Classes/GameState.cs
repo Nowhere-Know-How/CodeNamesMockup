@@ -1,12 +1,15 @@
 ﻿namespace CodeNames
 {
-    public enum GameStates
+    public enum GameState
     {
+        INIT,
+        WAIT,
         START, 
         PICK_TEAMS, 
-        WAIT, 
         TEAM_TURN, 
         RESOLVE, 
-        END
+        END,
+        IDLE
+
     }
 }

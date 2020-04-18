@@ -4,6 +4,7 @@ using CodeNames;
 
 namespace CodeNames
 {
+    // Listens for GameStates Events
     public class GameStateManager : Object
     {
         Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
@@ -12,9 +13,6 @@ namespace CodeNames
         int CardsToWinTeamBlue;
 
         private static GameStateManager instance = null;
-        //public delegate void OnStateChangeHandler();
-        //public event OnStateChangeHandler OnStateChange;
-        //public GameStates gameState { get; private set; }
 
         public static GameStateManager Instance
         {
@@ -28,22 +26,20 @@ namespace CodeNames
             }
         }
         
-        //public void SetGameState(GameStates state)
-        //{
-        //    this.gameState = state;
-        //    OnStateChange();
-        //}
-        //public void OnApplicationQuit()
-        //{
-        //    GameStateManager.instance = null;
-        //}
-
-        protected GameStateManager()
-        {
+        private void Init(GameState gameState){
+            Debug.Log("GameState: " + gameState.ToString());
             LoadKeyCardFromDB();
             LoadDeckFromDB();
             InitializeScore();
         }
+        
+        protected GameStateManager()
+        {
+            EventManager.onGameStateChange.AddListener(Init);
+
+        }
+
+
 
         protected void InitializeScore()
         {
