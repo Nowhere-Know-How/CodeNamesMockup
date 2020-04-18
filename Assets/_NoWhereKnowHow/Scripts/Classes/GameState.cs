@@ -2,6 +2,7 @@
 {
     public enum GameState
     {
+        NULL,
         INIT,
         INIT_DONE,
         PICK_TEAMS,
@@ -10,9 +11,16 @@
         WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_BLUE_TO_START,
         WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_RED_TO_START,
         BLUE_TEAM_TURN_START,
+        BLUE_TEAM_SUBMISSION,
+        BLUE_TEAM_TURN_TIMEOUT,
+        BLUE_TEAM_TURN_END,
+        BLUE_TEAM_WINS,
         RED_TEAM_TURN_START,
+        RED_TEAM_SUBMISSION,
+        RED_TEAM_TURN_TIMEOUT,
+        RED_TEAM_TURN_END,
+        RED_TEAM_WINS,
         RESOLVE, 
         END,
-        IDLE
     }
 }

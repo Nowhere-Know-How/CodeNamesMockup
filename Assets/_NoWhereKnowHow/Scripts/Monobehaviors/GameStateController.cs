@@ -50,6 +50,16 @@ namespace CodeNames
                     EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_START);
                     break;
 
+                case GameState.BLUE_TEAM_TURN_TIMEOUT:
+                case GameState.BLUE_TEAM_TURN_END:
+                    EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_START);
+                    break;
+
+                case GameState.RED_TEAM_TURN_TIMEOUT:
+                case GameState.RED_TEAM_TURN_END:
+                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_START);
+                    break;
+
                 default:
                     throw new System.NotImplementedException("GameState Not Implemented: " + gs.ToString());
             }
@@ -57,16 +67,16 @@ namespace CodeNames
 
         private void Update()
         {
-            //if (Input.GetKeyDown(KeyCode.N))
-            //{
-            //    Debug.Log("Invoke");
-            //    EventManager.onGameStateChange.Invoke(gameState);
-            //}
-            //if (Input.GetKeyDown(KeyCode.X))
-            //{
-            //    Card card = GameStateManager.Deck.DealCard();
-            //    Debug.Log("Draw Card. Info: Text -" + card.Text + ", State - " + card.State);
-            //}
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                Debug.Log("Red Turn Submit!");
+                EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_SUBMISSION);
+            }
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                Debug.Log("Blue Turn Submit!");
+                EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_SUBMISSION);
+            }
             //if (Input.GetKeyDown(KeyCode.C))
             //{
             //    GameStateManager.Deck.ResetDeck();

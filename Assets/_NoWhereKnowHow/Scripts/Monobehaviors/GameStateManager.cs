@@ -9,16 +9,21 @@ namespace CodeNames
     {
         public float waitTimeAfterTeamPick = 5f;
         public float waitTimePerTeamTurn = 5f;
+        int minPlayersRequired = 4;
 
         Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
         KeyCard keyCard;
+        
         int CardsToWinTeamRed;
-        int CardsToWinTeamBlue;
-
         Team redTeam = new Team();
+        Coroutine redTurnCoroutine;
+
+        int CardsToWinTeamBlue;
         Team blueTeam = new Team();
+        Coroutine blueTurnCoroutine;
+
         CardColor teamWithFirstTurn;
-        int minPlayersRequired = 4;
+        GameState currentTurn;
 
         bool isGameDataInited = false;
         bool isEventListenersInited = false;
@@ -127,15 +132,35 @@ namespace CodeNames
 
                 #region GAMESTATE BLUE_TEAM_TURN_START
                 case GameState.BLUE_TEAM_TURN_START:
-
+                    currentTurn = GameState.BLUE_TEAM_TURN_START;
+                    blueTurnCoroutine = StartCoroutine(EventManager.DelayInvoke(waitTimePerTeamTurn, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN_TIMEOUT));
                     break;
                 #endregion
 
                 #region GAMESTATE RED_TEAM_TURN_START
                 case GameState.RED_TEAM_TURN_START:
-
+                    currentTurn = GameState.RED_TEAM_TURN_START;
+                    redTurnCoroutine = StartCoroutine(EventManager.DelayInvoke(waitTimePerTeamTurn, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN_TIMEOUT));
                     break;
                 #endregion
+
+                case GameState.BLUE_TEAM_SUBMISSION:
+                    if (currentTurn == GameState.BLUE_TEAM_TURN_START)
+                    {
+                        StopCoroutine(blueTurnCoroutine);
+                        //Todo Score Submission
+                        
+                    }
+                    break;
+
+                case GameState.RED_TEAM_SUBMISSION:
+                    if (currentTurn == GameState.RED_TEAM_TURN_START)
+                    {
+                        StopCoroutine(redTurnCoroutine);
+                        //Todo Score Submission
+                        
+                    }
+                    break;
 
                 default:
                     throw new System.NotImplementedException("GameState Not Implemented: " + gs.ToString());
