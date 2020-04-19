@@ -8,7 +8,6 @@ namespace CodeNames
 {
     public class GameStateManager : SingletonBehaviour<GameStateManager>
     {
-        public float waitTimeAfterTeamPick = 5f;
         public float waitTimePerTeamTurn = 30f;
         public float waitTimePerCodeMasterTurn = 30f;
         public float waitTimeAfterCodeMasterSubmission = 5f;
@@ -34,16 +33,11 @@ namespace CodeNames
 
         bool isGameDataInited = false;
         bool isEventListenersInited = false;
-        bool isTeamsPicked = false;
         
 
         public bool IsGameDataInited
         {
             get { return isGameDataInited; }
-        }
-        public bool IsTeamsPicked
-        {
-            get { return isTeamsPicked; }
         }
         public CardColor TeamWithFirstTurn
         {
@@ -280,21 +274,13 @@ namespace CodeNames
                     Debug.Log("Red CodeMaster: " + redTeam.CodeMaster.PlayerName);
                     Debug.Log("Blue Team: " + blueTeam.ToString());
                     Debug.Log("Blue CodeMaster: " + blueTeam.CodeMaster.PlayerName);
-                    isTeamsPicked = true;
-                    EventManager.onGameStateChangeDone.Invoke(GameState.PICK_TEAMS_DONE);
-                    break;
-                #endregion
-
-                #region GAMESTATE WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER
-                case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER:
-                    Debug.Log("Game State Manager is waiting... ");
-                    if (teamWithFirstTurn == CardColor.Blue) 
+                    if (teamWithFirstTurn == CardColor.Blue)
                     {
-                        StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamPick, EventManager.onGameStateChangeDone, GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_BLUE_TO_START));
+                        EventManager.onGameStateChangeDone.Invoke(GameState.PICK_TEAMS_DONE_BLUE_TO_START);
                     }
                     else if (teamWithFirstTurn == CardColor.Red)
                     {
-                        StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamPick, EventManager.onGameStateChangeDone, GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_RED_TO_START));
+                        EventManager.onGameStateChangeDone.Invoke(GameState.PICK_TEAMS_DONE_RED_TO_START);
                     }
                     else
                     {

@@ -8,6 +8,8 @@ namespace CodeNames
     // Emits GameStates Events
     public class GameStateController : SingletonBehaviour<GameStateController>
     {
+        public float waitTimeAfterTeamPick = 5f;
+
         bool isEventListenersInited = false;
 
         private void Start()
@@ -38,16 +40,16 @@ namespace CodeNames
                     EventManager.onGameStateChange.Invoke(GameState.PICK_TEAMS);
                     break;
 
-                case GameState.PICK_TEAMS_DONE:
-                    EventManager.onGameStateChange.Invoke(GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER);
+                case GameState.PICK_TEAMS_DONE_BLUE_TO_START:
+                    Debug.Log("Waiting for teams to meet each other... " + waitTimeAfterTeamPick.ToString() + " seconds");
+                    StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamPick, EventManager.onGameStateChange, GameState.BLUE_TEAM_TURN_CODEMASTER_START));
+                    //EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_CODEMASTER_START);
                     break;
 
-                case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_BLUE_TO_START:
-                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_CODEMASTER_START);
-                    break;
-
-                case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_RED_TO_START:
-                    EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_CODEMASTER_START);
+                case GameState.PICK_TEAMS_DONE_RED_TO_START:
+                    Debug.Log("Waiting for teams to meet each other... " + waitTimeAfterTeamPick.ToString() + " seconds");
+                    StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamPick, EventManager.onGameStateChange, GameState.RED_TEAM_TURN_CODEMASTER_START));
+                    //EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_CODEMASTER_START);
                     break;
 
                 case GameState.BLUE_TEAM_TURN_CODEMASTER_TIMEOUT:
