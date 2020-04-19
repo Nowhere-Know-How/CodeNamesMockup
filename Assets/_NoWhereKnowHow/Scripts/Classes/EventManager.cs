@@ -9,10 +9,12 @@ namespace CodeNames
     public class EventManager
     {
         public static OnGameStateChange onGameStateChange = new OnGameStateChange();
-        public static OnGameStateChangeDone onGameStateChangeDone = new OnGameStateChangeDone();
+        public static OnGameStateControllerChange onGameStateControllerChange = new OnGameStateControllerChange();
+        public static OnGameStateManagerDone onGameStateManagerDone = new OnGameStateManagerDone();
 
         public static OnCodeMasterSubmission onCodeMasterSubmission = new OnCodeMasterSubmission();
         public static OnTeamSubmission onTeamSubmission = new OnTeamSubmission();
+        public static OnTeamSubmission onForwardedTeamSubmission = new OnTeamSubmission();
 
         private EventManager(){}
 

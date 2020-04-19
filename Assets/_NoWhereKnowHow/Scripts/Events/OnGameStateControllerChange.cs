@@ -8,8 +8,9 @@ namespace CodeNames
 {
 
     [System.Serializable]
-    public class OnGameStateChangeDone : UnityEvent<GameState>
+    public class OnGameStateControllerChange : UnityEvent<GameState>
     {
+
     }
 }
 

@@ -21,4 +21,9 @@ public class TeamCardSubmission
         cardIndex = index;
         teamColor = team;
     }
+
+    public string ToString()
+    {
+        return "Team Color: " + teamColor.ToString() + ", CardIndex: " + cardIndex.ToString();
+    }
 }
