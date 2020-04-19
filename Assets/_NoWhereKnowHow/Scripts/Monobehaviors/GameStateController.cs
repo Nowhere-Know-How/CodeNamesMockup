@@ -43,21 +43,47 @@ namespace CodeNames
                     break;
 
                 case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_BLUE_TO_START:
-                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_START);
+                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_CODEMASTER_START);
                     break;
 
                 case GameState.WAIT_FOR_TEAMS_TO_MEET_EACH_OTHER_DONE_RED_TO_START:
-                    EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_START);
+                    EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_CODEMASTER_START);
+                    break;
+
+                case GameState.BLUE_TEAM_TURN_CODEMASTER_TIMEOUT:
+                    EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_CODEMASTER_START);
+                    break;
+
+                case GameState.BLUE_TEAM_TURN_CONTINUE:
+                case GameState.BLUE_TEAM_TURN_CODEMASTER_SUBMISSION_DONE:
+                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_START);
                     break;
 
                 case GameState.BLUE_TEAM_TURN_TIMEOUT:
                 case GameState.BLUE_TEAM_TURN_END:
+                    EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_CODEMASTER_START);
+                    break;
+
+                case GameState.RED_TEAM_TURN_CODEMASTER_TIMEOUT:
+                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_CODEMASTER_START);
+                    break;
+
+                case GameState.RED_TEAM_TURN_CONTINUE:
+                case GameState.RED_TEAM_TURN_CODEMASTER_SUBMISSION_DONE:
                     EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_TURN_START);
                     break;
 
                 case GameState.RED_TEAM_TURN_TIMEOUT:
                 case GameState.RED_TEAM_TURN_END:
-                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_START);
+                    EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_TURN_CODEMASTER_START);
+                    break;
+
+                case GameState.BLUE_TEAM_WINS:
+                    Debug.Log("Blue Team Wins!");
+                    break;
+
+                case GameState.RED_TEAM_WINS:
+                    Debug.Log("Red Team Wins!");
                     break;
 
                 default:
@@ -65,28 +91,34 @@ namespace CodeNames
             }
         }
 
+        [Range(0, 24)]
+        public int debugCardIndex = 0;
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                Debug.Log("Red Turn Submit!");
-                EventManager.onGameStateChange.Invoke(GameState.RED_TEAM_SUBMISSION);
+                Debug.Log("Red CodeMaster Submit!");
+                Clue clue = new Clue(CardColor.Red, "happy", 3);
+                EventManager.onCodeMasterSubmission.Invoke(clue);
             }
             if (Input.GetKeyDown(KeyCode.B))
             {
-                Debug.Log("Blue Turn Submit!");
-                EventManager.onGameStateChange.Invoke(GameState.BLUE_TEAM_SUBMISSION);
+                Debug.Log("Blue CodeMaster Submit!");
+                Clue clue = new Clue(CardColor.Blue, "happy", 3);
+                EventManager.onCodeMasterSubmission.Invoke(clue);
             }
-            //if (Input.GetKeyDown(KeyCode.C))
-            //{
-            //    GameStateManager.Deck.ResetDeck();
-            //    Debug.Log("Reset Deck");
-            //}
-            //if (Input.GetKeyDown(KeyCode.R))
-            //{
-            //    GameStateManager.DrawNewDeck();
-            //    Debug.Log("Redraft Deck");
-            //}
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                Debug.Log("Red Team Submit");
+                TeamCardSubmission submission = new TeamCardSubmission(debugCardIndex, CardColor.Red);
+                EventManager.onTeamSubmission.Invoke(submission);
+            }
+            if (Input.GetKeyDown(KeyCode.N))
+            {
+                Debug.Log("Blue Team Submit");
+                TeamCardSubmission submission = new TeamCardSubmission(debugCardIndex, CardColor.Blue);
+                EventManager.onTeamSubmission.Invoke(submission);
+            }
             //if (Input.GetKeyDown(KeyCode.V))
             //{
             //    int index = 0;

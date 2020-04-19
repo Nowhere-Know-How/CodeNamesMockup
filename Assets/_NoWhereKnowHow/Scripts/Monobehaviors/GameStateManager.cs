@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using CodeNames;
 using System.Collections;
+using System;
 
 namespace CodeNames
 {
     public class GameStateManager : SingletonBehaviour<GameStateManager>
     {
         public float waitTimeAfterTeamPick = 5f;
-        public float waitTimePerTeamTurn = 5f;
+        public float waitTimePerTeamTurn = 30f;
+        public float waitTimePerCodeMasterTurn = 30f;
+        public float waitTimeAfterCodeMasterSubmission = 5f;
+        public float waitTimeCardResolution = 5f;
         int minPlayersRequired = 4;
 
         Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
@@ -17,13 +21,16 @@ namespace CodeNames
         int CardsToWinTeamRed;
         Team redTeam = new Team();
         Coroutine redTurnCoroutine;
+        Coroutine redCodeMasterTurnCoroutine;
 
         int CardsToWinTeamBlue;
         Team blueTeam = new Team();
         Coroutine blueTurnCoroutine;
+        Coroutine blueCodeMasterTurnCoroutine;
 
         CardColor teamWithFirstTurn;
         GameState currentTurn;
+        Clue lastClue;
 
         bool isGameDataInited = false;
         bool isEventListenersInited = false;
@@ -53,12 +60,178 @@ namespace CodeNames
             {
                 Debug.Log("GameStateManager Event Listeners Registered");
                 EventManager.onGameStateChange.AddListener(HandleStateChange);
+                EventManager.onCodeMasterSubmission.AddListener(HandleCodeMasterSubmission);
+                EventManager.onTeamSubmission.AddListener(HandleTeamSubmission);
                 isEventListenersInited = true;
             }
         }
 
         private GameStateManager()
         {
+        }
+
+        private void HandleTeamSubmission(TeamCardSubmission submission)
+        {
+            if (currentTurn == GameState.BLUE_TEAM_TURN_START && submission.TeamColor == CardColor.Blue)
+            {
+                StopCoroutine(blueTurnCoroutine);
+                RevealCardResolutions revealResolution = RevealCard(submission.CardIndex);
+                HandleRevealCardResolution(revealResolution, submission.TeamColor);
+            }
+            else if (currentTurn == GameState.RED_TEAM_TURN_START && submission.TeamColor == CardColor.Red)
+            {
+                StopCoroutine(redTurnCoroutine);
+                RevealCardResolutions revealResolution = RevealCard(submission.CardIndex);
+                HandleRevealCardResolution(revealResolution, submission.TeamColor);
+            }
+            else
+            {
+                Debug.Log("Ignored Choice submitted by team outside of their turn");
+            }
+        }
+
+        public void HandleRevealCardResolution(RevealCardResolutions revealResolution, CardColor teamColor)
+        {
+            switch (revealResolution)
+            {
+                case RevealCardResolutions.ALREADY_REVEALED:
+                    Debug.Log("Ignored Submission. Already revealed card was chosen");
+                    break;
+
+                case RevealCardResolutions.REVEALED_BLACK_TEAM_CARD:
+                    Debug.Log("Black card revealed! " + teamColor.ToString() + " team loses the game");
+                    currentTurn = GameState.NULL;
+                    if (teamColor == CardColor.Blue)
+                    {
+                        EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.RED_TEAM_WINS);
+                    }
+                    else if (teamColor == CardColor.Red)
+                    {
+                        EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_WINS);
+                    }
+                    else
+                    {
+                        throw new System.InvalidOperationException("A team must be blue or red");
+                    }
+                    break;
+
+                case RevealCardResolutions.REVEALED_BROWN_TEAM_CARD:
+                    Debug.Log("Brown card revealed! " + teamColor.ToString() + " team loses their turn");
+                    currentTurn = GameState.NULL;
+                    if (teamColor == CardColor.Blue)
+                    {
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN_END));
+                    }
+                    else if (teamColor == CardColor.Red)
+                    {
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN_END));
+                    }
+                    else
+                    {
+                        throw new System.InvalidOperationException("A team must be blue or red");
+                    }
+                    break;
+
+                case RevealCardResolutions.REVEALED_BLUE_TEAM_CARD:
+                    currentTurn = GameState.NULL;
+                    CardsToWinTeamBlue -= 1;
+                    PrintScore();
+                    if (CardsToWinTeamBlue == 0)
+                    {
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_WINS));
+                    }
+                    else
+                    {
+                        if (teamColor == CardColor.Blue)
+                        {
+                            Debug.Log("Blue card revealed! " + teamColor.ToString() + " team continues their turn");
+                            StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN_CONTINUE));
+                        }
+                        else if (teamColor == CardColor.Red)
+                        {
+                            Debug.Log("Blue card revealed! " + teamColor.ToString() + " team loses their turn");
+                            StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN_END));
+                        }
+                        else
+                        {
+                            throw new System.InvalidOperationException("A team must be blue or red");
+                        }
+                    }
+                    break;
+
+
+
+                case RevealCardResolutions.REVEALED_RED_TEAM_CARD:
+                    currentTurn = GameState.NULL;
+                    CardsToWinTeamRed -= 1;
+                    PrintScore();
+                    if (CardsToWinTeamRed == 0)
+                    {
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.RED_TEAM_WINS));
+                    }
+                    else
+                    {
+                        if (teamColor == CardColor.Blue)
+                        {
+                            Debug.Log("Red card revealed! " + teamColor.ToString() + " team loses their turn");
+                            StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN_END));
+                        }
+                        else if (teamColor == CardColor.Red)
+                        {
+                            Debug.Log("Red card revealed! " + teamColor.ToString() + " team continues their turn");
+                            StartCoroutine(EventManager.DelayInvoke(waitTimeCardResolution, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN_CONTINUE));
+                        }
+                        else
+                        {
+                            throw new System.InvalidOperationException("A team must be blue or red");
+                        }
+                    }
+                    break;
+
+                default:
+                    throw new System.NotImplementedException("RevealCardResolutions not implemented: " + revealResolution.ToString());
+
+
+            }
+        }
+
+        private void HandleCodeMasterSubmission(Clue clue)
+        {
+            switch (clue.Team)
+            { 
+                case CardColor.Blue:
+                    if (currentTurn == GameState.BLUE_TEAM_TURN_CODEMASTER_START)
+                    {
+                        Debug.Log("Blue clue submitted: " + clue.ToString());
+                        StopCoroutine(blueCodeMasterTurnCoroutine);
+                        currentTurn = GameState.NULL;
+                        lastClue = clue;
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeAfterCodeMasterSubmission, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN_CODEMASTER_SUBMISSION_DONE));
+                    }
+                    else
+                    {
+                        throw new System.InvalidOperationException("Clue submitted by team outside of their turn");
+                    }
+                    break;
+
+                case CardColor.Red:
+                    if (currentTurn == GameState.RED_TEAM_TURN_CODEMASTER_START)
+                    {
+                        Debug.Log("Red clue submitted: " + clue.ToString());
+                        StopCoroutine(redCodeMasterTurnCoroutine);
+                        currentTurn = GameState.NULL;
+                        lastClue = clue;
+                        StartCoroutine(EventManager.DelayInvoke(waitTimeAfterCodeMasterSubmission, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN_CODEMASTER_SUBMISSION_DONE));
+                    }
+                    else
+                    {
+                        Debug.Log("Ignored: Clue submitted by team outside of their turn");
+                    }
+                    break;
+
+                default:
+                    throw new System.NotImplementedException("Clue Not Implemented: " + clue.ToString());
+            }
         }
 
         private void HandleStateChange(GameState gs)
@@ -130,36 +303,28 @@ namespace CodeNames
                     break;
                 #endregion
 
-                #region GAMESTATE BLUE_TEAM_TURN_START
+                #region GAMESTATE BLUE_TEAM_TURN_CODEMASTER_START
+                case GameState.BLUE_TEAM_TURN_CODEMASTER_START:
+                    currentTurn = gs;
+                    blueCodeMasterTurnCoroutine = StartCoroutine(EventManager.DelayInvoke(waitTimePerCodeMasterTurn, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN_CODEMASTER_TIMEOUT));
+                    break;
+                #endregion
+
+                #region GAMESTATE RED_TEAM_TURN_CODEMASTER_START
+                case GameState.RED_TEAM_TURN_CODEMASTER_START:
+                    currentTurn = gs;
+                    redCodeMasterTurnCoroutine = StartCoroutine(EventManager.DelayInvoke(waitTimePerCodeMasterTurn, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN_CODEMASTER_TIMEOUT));
+                    break;
+                #endregion
+
                 case GameState.BLUE_TEAM_TURN_START:
-                    currentTurn = GameState.BLUE_TEAM_TURN_START;
+                    currentTurn = gs;
                     blueTurnCoroutine = StartCoroutine(EventManager.DelayInvoke(waitTimePerTeamTurn, EventManager.onGameStateChangeDone, GameState.BLUE_TEAM_TURN_TIMEOUT));
                     break;
-                #endregion
 
-                #region GAMESTATE RED_TEAM_TURN_START
                 case GameState.RED_TEAM_TURN_START:
-                    currentTurn = GameState.RED_TEAM_TURN_START;
+                    currentTurn = gs;
                     redTurnCoroutine = StartCoroutine(EventManager.DelayInvoke(waitTimePerTeamTurn, EventManager.onGameStateChangeDone, GameState.RED_TEAM_TURN_TIMEOUT));
-                    break;
-                #endregion
-
-                case GameState.BLUE_TEAM_SUBMISSION:
-                    if (currentTurn == GameState.BLUE_TEAM_TURN_START)
-                    {
-                        StopCoroutine(blueTurnCoroutine);
-                        //Todo Score Submission
-                        
-                    }
-                    break;
-
-                case GameState.RED_TEAM_SUBMISSION:
-                    if (currentTurn == GameState.RED_TEAM_TURN_START)
-                    {
-                        StopCoroutine(redTurnCoroutine);
-                        //Todo Score Submission
-                        
-                    }
                     break;
 
                 default:
@@ -264,8 +429,13 @@ namespace CodeNames
             {
                 deck.Add(new Card(words[i]));
             }
+            Debug.Log("Words in Deck: " + String.Join(", ", words.ToArray()));
         }
 
+        protected void PrintScore()
+        {
+            Debug.Log("Cards Left to Win: " + "\nRed - " + CardsToWinTeamRed.ToString() + ", Blue - " + CardsToWinTeamBlue.ToString());
+        }
         
     }
 }

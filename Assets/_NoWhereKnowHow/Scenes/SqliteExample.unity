@@ -178,7 +178,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waitTimeAfterTeamPick: 5
-  waitTimePerTeamTurn: 10
+  waitTimePerTeamTurn: 30
+  waitTimeAfterCodeMasterSubmission: 3
 --- !u!1 &241972226
 GameObject:
   m_ObjectHideFlags: 0
