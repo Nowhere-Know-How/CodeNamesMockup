@@ -16,41 +16,41 @@ namespace CodeNames
         [SerializeField]
         public bool LoadKeys = false;
 
-        [SerializeField]
-        public bool ReadVocabulary = false;
+        // [SerializeField]
+        // public bool ReadVocabulary = false;
 
         // Start is called before the first frame update
         void Start(){
             if(LoadVocabulary){
                 LoadVocab();
             }
-            if(ReadVocabulary){
-                ReadVocab();
-            }
+            // if(ReadVocabulary){
+            //     ReadVocab();
+            // }
             if(LoadKeys){
                 LoadKeyFiles();
             }
         }
 
-        void ReadVocab(){
-            List<string> vocab = new List<string>();
+        // void ReadVocab(){
+        //     List<string> vocab = new List<string>();
 
-            // Connect to database
-            string connection = "URI=file:" + Path.Combine(new string[] {Application.dataPath, "Data", "codenames.db"});
-            IDbConnection dbcon = new SqliteConnection(connection);
-            dbcon.Open();
+        //     // Connect to database
+        //     string connection = "URI=file:" + Path.Combine(new string[] {Application.dataPath, "Data", "codenames.db"});
+        //     IDbConnection dbcon = new SqliteConnection(connection);
+        //     dbcon.Open();
 
-            IDbCommand selectCmd = dbcon.CreateCommand();
-            IDataReader selectReader;
-            string q_select = "select * from vocab";
-            selectCmd.CommandText = q_select;
-            selectReader = selectCmd.ExecuteReader();
-            while(selectReader.Read()){
-                Debug.Log(selectReader.ToString());
-            }
+        //     IDbCommand selectCmd = dbcon.CreateCommand();
+        //     IDataReader selectReader;
+        //     string q_select = "select * from vocab";
+        //     selectCmd.CommandText = q_select;
+        //     selectReader = selectCmd.ExecuteReader();
+        //     while(selectReader.Read()){
+        //         Debug.Log(selectReader.ToString());
+        //     }
             
 
-        }
+        // }
 
         void LoadVocab(){
             // List<string> vocab = new List<string>();
