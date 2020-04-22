@@ -17,31 +17,27 @@ namespace CodeNames
         public float waitTimeAfterTeamSubmissionResolution = 3f;
 
         bool isEventListenersInited = false;
-
         GameState currentTurn;
-        Clue lastClue;
-
+        
         Coroutine redTurnCoroutine;
         Coroutine redCodeMasterTurnCoroutine;
         Coroutine blueTurnCoroutine;
         Coroutine blueCodeMasterTurnCoroutine;
-
-
-        private void Start()
-        {
-            EventManager.onGameStateChange.Invoke(GameState.INIT);
-        }
+        
         void Awake()
         {
             InitEventListeners();
         }
-
+        void Start()
+        {
+            EventManager.onGameStateChange.Invoke(GameState.INIT);
+        }
         public void InitEventListeners()
         {
             if (!isEventListenersInited)
             {
                 Debug.Log("GameStateManager Event Listeners Registered");
-                EventManager.onGameStateManagerDone.AddListener(HandleStateChangeDone);
+                EventManager.onGameStateApiDone.AddListener(HandleGameStateApiDone);
                 EventManager.onGameStateControllerChange.AddListener(HandleControllerStateChange);
                 EventManager.onCodeMasterSubmission.AddListener(HandleCodeMasterSubmission);
                 EventManager.onTeamSubmission.AddListener(HandleTeamSubmission);
@@ -53,16 +49,10 @@ namespace CodeNames
         {
             if (currentTurn == GameState.BLUE_TEAM_TURN_START && submission.TeamColor == CardColor.Blue)
             {
-                //Debug.Log("Team Submission received by Game Controller: " + submission.ToString());
-                //StopCoroutine(blueTurnCoroutine);
-                //currentTurn = GameState.NULL;
                 EventManager.onForwardedTeamSubmission.Invoke(submission);
             }
             else if (currentTurn == GameState.RED_TEAM_TURN_START && submission.TeamColor == CardColor.Red)
             {
-                //Debug.Log("Team Submission received by Game Controller: " + submission.ToString());
-                //StopCoroutine(redTurnCoroutine);
-                //currentTurn = GameState.NULL;
                 EventManager.onForwardedTeamSubmission.Invoke(submission);
             }
             else
@@ -79,10 +69,7 @@ namespace CodeNames
                     if (currentTurn == GameState.BLUE_TEAM_TURN_CODEMASTER_START)
                     {
                         Debug.Log("Blue clue submitted: " + clue.ToString());
-                        StopCoroutine(blueCodeMasterTurnCoroutine);
-                        currentTurn = GameState.NULL;
-                        lastClue = clue;
-                        EventManager.onGameStateControllerChange.Invoke(GameState.BLUE_TEAM_TURN_CODEMASTER_SUBMISSION_DONE);
+                        EventManager.onForwardedCodeMasterSubmission.Invoke(clue);
                     }
                     else
                     {
@@ -94,10 +81,7 @@ namespace CodeNames
                     if (currentTurn == GameState.RED_TEAM_TURN_CODEMASTER_START)
                     {
                         Debug.Log("Red clue submitted: " + clue.ToString());
-                        StopCoroutine(redCodeMasterTurnCoroutine);
-                        currentTurn = GameState.NULL;
-                        lastClue = clue;
-                        EventManager.onGameStateControllerChange.Invoke(GameState.RED_TEAM_TURN_CODEMASTER_SUBMISSION_DONE);
+                        EventManager.onForwardedCodeMasterSubmission.Invoke(clue);
                     }
                     else
                     {
@@ -130,21 +114,27 @@ namespace CodeNames
 
                 case GameState.BLUE_TEAM_TURN_CODEMASTER_TIMEOUT:
                     Debug.Log("Codemaster timed out... Waiting " + waitTimeAfterCodeMasterTimeout.ToString() + " seconds for next turn to resume.");
+                    currentTurn = GameState.NULL;
                     StartCoroutine(EventManager.DelayInvoke(waitTimeAfterCodeMasterTimeout, EventManager.onGameStateControllerChange, GameState.RED_TEAM_TURN_CODEMASTER_START));
                     break;
 
                 case GameState.RED_TEAM_TURN_CODEMASTER_TIMEOUT:
                     Debug.Log("Codemaster timed out... Waiting " + waitTimeAfterCodeMasterTimeout.ToString() + " seconds for next turn to resume.");
+                    currentTurn = GameState.NULL;
                     StartCoroutine(EventManager.DelayInvoke(waitTimeAfterCodeMasterTimeout, EventManager.onGameStateControllerChange, GameState.BLUE_TEAM_TURN_CODEMASTER_START));
                     break;
 
                 case GameState.BLUE_TEAM_TURN_CODEMASTER_SUBMISSION_DONE:
                     Debug.Log("Codemaster submission received! Waiting " + waitTimeAfterCodeMasterSubmission.ToString() + " seconds for next phase");
+                    StopCoroutine(blueCodeMasterTurnCoroutine);
+                    currentTurn = GameState.NULL;
                     StartCoroutine(EventManager.DelayInvoke(waitTimeAfterCodeMasterSubmission, EventManager.onGameStateControllerChange, GameState.BLUE_TEAM_TURN_START));
                     break;
 
                 case GameState.RED_TEAM_TURN_CODEMASTER_SUBMISSION_DONE:
                     Debug.Log("Codemaster submission received! Waiting " + waitTimeAfterCodeMasterSubmission.ToString() + " seconds for next phase");
+                    StopCoroutine(redCodeMasterTurnCoroutine);
+                    currentTurn = GameState.NULL;
                     StartCoroutine(EventManager.DelayInvoke(waitTimeAfterCodeMasterSubmission, EventManager.onGameStateControllerChange, GameState.RED_TEAM_TURN_START));
                     break;
 
@@ -175,7 +165,7 @@ namespace CodeNames
             }
         }
 
-        private void HandleStateChangeDone(GameState gs)
+        private void HandleGameStateApiDone(GameState gs)
         {
             //Debug.Log("GAME STATE CHANGED: " + gs.ToString());
             switch (gs)
@@ -194,11 +184,26 @@ namespace CodeNames
                     StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamPick, EventManager.onGameStateControllerChange, GameState.RED_TEAM_TURN_CODEMASTER_START));
                     break;
 
+
+                case GameState.BLUE_TEAM_TURN_NO_MORE_GUESSES:
+                    StopCoroutine(blueTurnCoroutine);
+                    currentTurn = GameState.NULL;
+                    Debug.Log("Blue team turn ended. No more guesses! Waiting " + waitTimeAfterTeamSubmissionResolution.ToString() + " seconds.");
+                    StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamSubmissionResolution, EventManager.onGameStateControllerChange, GameState.RED_TEAM_TURN_CODEMASTER_START));
+                    break;
+
                 case GameState.BLUE_TEAM_TURN_END:
                     StopCoroutine(blueTurnCoroutine);
                     currentTurn = GameState.NULL;
                     Debug.Log("Blue team turn ended. Waiting " + waitTimeAfterTeamSubmissionResolution.ToString() + " seconds.");
                     StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamSubmissionResolution, EventManager.onGameStateControllerChange, GameState.RED_TEAM_TURN_CODEMASTER_START));
+                    break;
+                
+                case GameState.RED_TEAM_TURN_NO_MORE_GUESSES:
+                    StopCoroutine(redTurnCoroutine);
+                    currentTurn = GameState.NULL;
+                    Debug.Log("Red team turn ended. No more guesses! Waiting " + waitTimeAfterTeamSubmissionResolution.ToString() + " seconds.");
+                    StartCoroutine(EventManager.DelayInvoke(waitTimeAfterTeamSubmissionResolution, EventManager.onGameStateControllerChange, GameState.BLUE_TEAM_TURN_CODEMASTER_START));
                     break;
 
                 case GameState.RED_TEAM_TURN_END:
@@ -240,6 +245,8 @@ namespace CodeNames
                     Debug.Log("Red Team Wins!");
                     break;
 
+
+
                 default:
                     throw new System.NotImplementedException("GameState Not Implemented: " + gs.ToString());
             }
@@ -252,13 +259,13 @@ namespace CodeNames
             if (Input.GetKeyDown(KeyCode.R))
             {
                 //Debug.Log("Red CodeMaster Submit!");
-                Clue clue = new Clue(CardColor.Red, "happy", 3);
+                Clue clue = new Clue(CardColor.Red, "happy", 1);
                 EventManager.onCodeMasterSubmission.Invoke(clue);
             }
             if (Input.GetKeyDown(KeyCode.B))
             {
                 //Debug.Log("Blue CodeMaster Submit!");
-                Clue clue = new Clue(CardColor.Blue, "panda", 3);
+                Clue clue = new Clue(CardColor.Blue, "panda", 1);
                 EventManager.onCodeMasterSubmission.Invoke(clue);
             }
             if (Input.GetKeyDown(KeyCode.T))

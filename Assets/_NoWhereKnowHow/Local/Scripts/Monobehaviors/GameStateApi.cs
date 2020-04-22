@@ -8,7 +8,8 @@ namespace CodeNames
 {
     public class GameStateApi : SingletonBehaviour<GameStateApi>
     {
-        public float waitTimeCardResolution = 5f;
+        public int guessesLeft = -1;
+
         int minPlayersRequired = 4;
 
         Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
@@ -22,14 +23,10 @@ namespace CodeNames
 
         CardColor teamWithFirstTurn;
 
-        bool isGameDataInited = false;
+        Clue lastClue;
+
         bool isEventListenersInited = false;
         
-
-        public bool IsGameDataInited
-        {
-            get { return isGameDataInited; }
-        }
         public CardColor TeamWithFirstTurn
         {
             get { return teamWithFirstTurn; }
@@ -46,12 +43,41 @@ namespace CodeNames
                 Debug.Log("GameStateManager Event Listeners Registered");
                 EventManager.onGameStateChange.AddListener(HandleStateChange);
                 EventManager.onForwardedTeamSubmission.AddListener(HandleTeamSubmission);
+                EventManager.onForwardedCodeMasterSubmission.AddListener(HandleCodeMasterSubmission);
                 isEventListenersInited = true;
             }
         }
 
         private GameStateApi()
         {
+        }
+
+        private void HandleCodeMasterSubmission(Clue clue)
+        {
+            lastClue = clue;
+            if (clue.Number <= 0)
+            {
+                guessesLeft = 25;
+            }
+            else
+            {
+                guessesLeft = clue.Number + 1;
+            }
+
+            switch (clue.Team)
+            {
+                case CardColor.Blue:
+                    EventManager.onGameStateControllerChange.Invoke(GameState.BLUE_TEAM_TURN_CODEMASTER_SUBMISSION_DONE);
+                    break;
+
+                case CardColor.Red:
+                    EventManager.onGameStateControllerChange.Invoke(GameState.RED_TEAM_TURN_CODEMASTER_SUBMISSION_DONE);
+                    break;
+
+                default:
+                    throw new NotImplementedException("Clue team not implemented: " + clue.Team.ToString());
+            }
+
         }
 
         private void HandleTeamSubmission(TeamCardSubmission submission)
@@ -73,11 +99,11 @@ namespace CodeNames
                     Debug.Log("Black card revealed! " + teamColor.ToString() + " team loses the game");
                     if (teamColor == CardColor.Blue)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.RED_TEAM_WINS);
+                        EventManager.onGameStateApiDone.Invoke(GameState.RED_TEAM_WINS);
                     }
                     else if (teamColor == CardColor.Red)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.BLUE_TEAM_WINS);
+                        EventManager.onGameStateApiDone.Invoke(GameState.BLUE_TEAM_WINS);
                     }
                     else
                     {
@@ -89,11 +115,11 @@ namespace CodeNames
                     Debug.Log("Brown card revealed! " + teamColor.ToString() + " team loses their turn");
                     if (teamColor == CardColor.Blue)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.BLUE_TEAM_TURN_END);
+                        EventManager.onGameStateApiDone.Invoke(GameState.BLUE_TEAM_TURN_END);
                     }
                     else if (teamColor == CardColor.Red)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.RED_TEAM_TURN_END);
+                        EventManager.onGameStateApiDone.Invoke(GameState.RED_TEAM_TURN_END);
                     }
                     else
                     {
@@ -102,23 +128,31 @@ namespace CodeNames
                     break;
 
                 case RevealCardResolutions.REVEALED_BLUE_TEAM_CARD:
+                    guessesLeft -= 1;
                     CardsToWinTeamBlue -= 1;
                     PrintScore();
                     if (CardsToWinTeamBlue == 0)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.BLUE_TEAM_WINS);
+                        EventManager.onGameStateApiDone.Invoke(GameState.BLUE_TEAM_WINS);
                     }
                     else
                     {
                         if (teamColor == CardColor.Blue)
                         {
-                            Debug.Log("Blue card revealed! " + teamColor.ToString() + " team continues their turn");
-                            EventManager.onGameStateManagerDone.Invoke(GameState.BLUE_TEAM_TURN_CONTINUE);
+                            if (guessesLeft == 0)
+                            {
+                                EventManager.onGameStateApiDone.Invoke(GameState.BLUE_TEAM_TURN_NO_MORE_GUESSES);
+                            }
+                            else
+                            {
+                                Debug.Log("Blue card revealed! Team continues. Guesses left: " + guessesLeft.ToString());
+                                EventManager.onGameStateApiDone.Invoke(GameState.BLUE_TEAM_TURN_CONTINUE);
+                            }
                         }
                         else if (teamColor == CardColor.Red)
                         {
                             Debug.Log("Blue card revealed! " + teamColor.ToString() + " team loses their turn");
-                            EventManager.onGameStateManagerDone.Invoke(GameState.RED_TEAM_TURN_END);
+                            EventManager.onGameStateApiDone.Invoke(GameState.RED_TEAM_TURN_END);
                         }
                         else
                         {
@@ -130,23 +164,31 @@ namespace CodeNames
 
 
                 case RevealCardResolutions.REVEALED_RED_TEAM_CARD:
+                    guessesLeft -= 1;
                     CardsToWinTeamRed -= 1;
                     PrintScore();
                     if (CardsToWinTeamRed == 0)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.RED_TEAM_WINS);
+                        EventManager.onGameStateApiDone.Invoke(GameState.RED_TEAM_WINS);
                     }
                     else
                     {
                         if (teamColor == CardColor.Blue)
                         {
                             Debug.Log("Red card revealed! " + teamColor.ToString() + " team loses their turn");
-                            EventManager.onGameStateManagerDone.Invoke(GameState.BLUE_TEAM_TURN_END);
+                            EventManager.onGameStateApiDone.Invoke(GameState.BLUE_TEAM_TURN_END);
                         }
                         else if (teamColor == CardColor.Red)
                         {
-                            Debug.Log("Red card revealed! " + teamColor.ToString() + " team continues their turn");
-                            EventManager.onGameStateManagerDone.Invoke(GameState.RED_TEAM_TURN_CONTINUE);
+                            if (guessesLeft == 0)
+                            {
+                                EventManager.onGameStateApiDone.Invoke(GameState.RED_TEAM_TURN_NO_MORE_GUESSES);
+                            }
+                            else
+                            {
+                                Debug.Log("Red card revealed! Team continues. Guesses left: " + guessesLeft.ToString());
+                                EventManager.onGameStateApiDone.Invoke(GameState.RED_TEAM_TURN_CONTINUE);
+                            }
                         }
                         else
                         {
@@ -174,8 +216,7 @@ namespace CodeNames
                     LoadKeyCardFromDB();
                     LoadDeckFromDB();
                     InitializeScore();
-                    isGameDataInited = true;
-                    EventManager.onGameStateManagerDone.Invoke(GameState.INIT_DONE);
+                    EventManager.onGameStateApiDone.Invoke(GameState.INIT_DONE);
                     break;
                 #endregion
 
@@ -212,11 +253,11 @@ namespace CodeNames
                     Debug.Log("Blue CodeMaster: " + blueTeam.CodeMaster.PlayerName);
                     if (teamWithFirstTurn == CardColor.Blue)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.PICK_TEAMS_DONE_BLUE_TO_START);
+                        EventManager.onGameStateApiDone.Invoke(GameState.PICK_TEAMS_DONE_BLUE_TO_START);
                     }
                     else if (teamWithFirstTurn == CardColor.Red)
                     {
-                        EventManager.onGameStateManagerDone.Invoke(GameState.PICK_TEAMS_DONE_RED_TO_START);
+                        EventManager.onGameStateApiDone.Invoke(GameState.PICK_TEAMS_DONE_RED_TO_START);
                     }
                     else
                     {

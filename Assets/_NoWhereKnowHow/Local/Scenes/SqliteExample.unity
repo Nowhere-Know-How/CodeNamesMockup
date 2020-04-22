@@ -151,13 +151,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44f6c042916a039418e6b9bf2e11962e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waitTimeAfterTeamPick: 5
-  waitTimePerCodeMasterTurn: 10
-  waitTimeAfterCodeMasterSubmission: 3
-  waitTimeAfterCodeMasterTimeout: 3
-  waitTimePerTeamTurn: 10
-  waitTimeAfterTeamTimeout: 3
-  debugCardIndex: 0
+  waitTimeAfterTeamPick: 1
+  waitTimePerCodeMasterTurn: 20
+  waitTimeAfterCodeMasterSubmission: 1
+  waitTimeAfterCodeMasterTimeout: 1
+  waitTimePerTeamTurn: 20
+  waitTimeAfterTeamTimeout: 1
+  waitTimeAfterTeamSubmissionResolution: 1
+  debugCardIndex: 4
 --- !u!4 &34442701
 Transform:
   m_ObjectHideFlags: 0
@@ -184,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 796b9c7d4b207a44288c8d99f3e3d5c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waitTimeCardResolution: 5
+  guessesLeft: -1
 --- !u!1 &241972226
 GameObject:
   m_ObjectHideFlags: 0

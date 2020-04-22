@@ -10,9 +10,10 @@ namespace CodeNames
     {
         public static OnGameStateChange onGameStateChange = new OnGameStateChange();
         public static OnGameStateControllerChange onGameStateControllerChange = new OnGameStateControllerChange();
-        public static OnGameStateManagerDone onGameStateManagerDone = new OnGameStateManagerDone();
+        public static OnGameStateApiDone onGameStateApiDone = new OnGameStateApiDone();
 
         public static OnCodeMasterSubmission onCodeMasterSubmission = new OnCodeMasterSubmission();
+        public static OnCodeMasterSubmission onForwardedCodeMasterSubmission = new OnCodeMasterSubmission();
         public static OnTeamSubmission onTeamSubmission = new OnTeamSubmission();
         public static OnTeamSubmission onForwardedTeamSubmission = new OnTeamSubmission();
 
