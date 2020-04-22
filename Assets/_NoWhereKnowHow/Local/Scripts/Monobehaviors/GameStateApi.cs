@@ -91,6 +91,22 @@ namespace CodeNames
         {
             switch (revealResolution)
             {
+                case RevealCardResolutions.PASS:
+                    Debug.Log("Team passed turn");
+                    if (teamColor == CardColor.Blue)
+                    {
+                        EventManager.onGameStateApiDone.Invoke(GameState.BLUE_TEAM_TURN_END);
+                    }
+                    else if (teamColor == CardColor.Red)
+                    {
+                        EventManager.onGameStateApiDone.Invoke(GameState.RED_TEAM_TURN_END);
+                    }
+                    else
+                    {
+                        throw new System.InvalidOperationException("A team must be blue or red");
+                    }
+                    break;
+
                 case RevealCardResolutions.ALREADY_REVEALED:
                     Debug.Log("Ignored Submission. Already revealed card was chosen");
                     break;
@@ -307,10 +323,16 @@ namespace CodeNames
             Debug.Log("Cards Left to Win: " + "\nRed - " + CardsToWinTeamRed.ToString() + ", Blue - " + CardsToWinTeamBlue.ToString());
         }
 
-        private RevealCardResolutions RevealCard(int index) //Reveals the card at the index of the deck
+        private RevealCardResolutions RevealCard(CardChoice cardChoice) //Reveals the card at the index of the deck
         {
             try
             {
+                if (cardChoice == CardChoice.PASS)
+                {
+                    return RevealCardResolutions.PASS;
+                }
+
+                int index = (int)cardChoice;
                 if (deck.Cards[index].State == CardState.Revealed){
                     return RevealCardResolutions.ALREADY_REVEALED;
                 }

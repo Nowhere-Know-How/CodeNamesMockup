@@ -271,13 +271,19 @@ namespace CodeNames
             if (Input.GetKeyDown(KeyCode.T))
             {
                 //Debug.Log("Red Team Submit");
-                TeamCardSubmission submission = new TeamCardSubmission(debugCardIndex, CardColor.Red);
+                TeamCardSubmission submission = new TeamCardSubmission((CardChoice)debugCardIndex, CardColor.Red);
                 EventManager.onTeamSubmission.Invoke(submission);
             }
             if (Input.GetKeyDown(KeyCode.N))
             {
                 //Debug.Log("Blue Team Submit");
-                TeamCardSubmission submission = new TeamCardSubmission(debugCardIndex, CardColor.Blue);
+                TeamCardSubmission submission = new TeamCardSubmission((CardChoice)debugCardIndex, CardColor.Blue);
+                EventManager.onTeamSubmission.Invoke(submission);
+            }
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                //Debug.Log("Blue Team Submit");
+                TeamCardSubmission submission = new TeamCardSubmission(CardChoice.PASS, CardColor.Blue);
                 EventManager.onTeamSubmission.Invoke(submission);
             }
         }

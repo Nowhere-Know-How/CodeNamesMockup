@@ -7,6 +7,7 @@
         REVEALED_BROWN_TEAM_CARD,
         REVEALED_BLACK_TEAM_CARD,
         ALREADY_REVEALED,
+        PASS,
         ERROR
     }
 }
