@@ -128,6 +128,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4860980706083984584, guid: 5a342bcf788b9094a91bf268147be59c,
+        type: 3}
+      propertyPath: m_Text
+      value: Start as Client
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546117041435579127, guid: 5a342bcf788b9094a91bf268147be59c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5546117042684590342, guid: 5a342bcf788b9094a91bf268147be59c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7250496157338003941, guid: 5a342bcf788b9094a91bf268147be59c,
         type: 3}
       propertyPath: m_LocalPosition.x

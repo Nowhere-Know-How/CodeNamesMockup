@@ -38,7 +38,10 @@ MonoBehaviour:
       _initWithNetworkScenes:
       - _buildIndex: 1
         _sceneName: StartScene
-        _sceneOffset: {x: 0, y: 0, z: 0}
+        _sceneOffset:
+          x: 0
+          y: 0
+          z: 0
         _settings:
           _maxConnections: 64
           _useTCP: 0
@@ -57,7 +60,10 @@ MonoBehaviour:
             _port: 0
       - _buildIndex: 4
         _sceneName: World_2_1
-        _sceneOffset: {x: 0, y: 0, z: 0}
+        _sceneOffset:
+          x: 0
+          y: 0
+          z: 0
         _settings:
           _maxConnections: 64
           _useTCP: 0
@@ -76,7 +82,10 @@ MonoBehaviour:
             _port: 0
       - _buildIndex: 5
         _sceneName: World_2_2
-        _sceneOffset: {x: 0, y: 0, z: 0}
+        _sceneOffset:
+          x: 0
+          y: 0
+          z: 0
         _settings:
           _maxConnections: 64
           _useTCP: 0
@@ -117,7 +126,10 @@ MonoBehaviour:
       _initWithNetworkScenes:
       - _buildIndex: 2
         _sceneName: World_1_1
-        _sceneOffset: {x: 0, y: 0, z: 0}
+        _sceneOffset:
+          x: 0
+          y: 0
+          z: 0
         _settings:
           _maxConnections: 64
           _useTCP: 0
@@ -136,7 +148,10 @@ MonoBehaviour:
             _port: 0
       - _buildIndex: 3
         _sceneName: World_1_2
-        _sceneOffset: {x: 0, y: 0, z: 0}
+        _sceneOffset:
+          x: 0
+          y: 0
+          z: 0
         _settings:
           _maxConnections: 64
           _useTCP: 0
@@ -177,7 +192,10 @@ MonoBehaviour:
       _initWithNetworkScenes:
       - _buildIndex: 6
         _sceneName: World_3_1
-        _sceneOffset: {x: 0, y: 0, z: 0}
+        _sceneOffset:
+          x: 0
+          y: 0
+          z: 0
         _settings:
           _maxConnections: 64
           _useTCP: 0
@@ -196,7 +214,10 @@ MonoBehaviour:
             _port: 0
       - _buildIndex: 7
         _sceneName: World_3_2
-        _sceneOffset: {x: 0, y: 0, z: 0}
+        _sceneOffset:
+          x: 0
+          y: 0
+          z: 0
         _settings:
           _maxConnections: 64
           _useTCP: 0
