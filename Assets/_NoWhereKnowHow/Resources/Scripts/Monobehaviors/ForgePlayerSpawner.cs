@@ -35,8 +35,8 @@ public class ForgePlayerSpawner : MonoBehaviour {
             if (_manager == null) {
                 return;
             }
-
             ForgePlayer playerBehavior = _manager.InstantiateNetworkBehavior("ForgePlayer", null, transform.position, transform.rotation) as ForgePlayer;
+
             if (playerBehavior == null) {
                 return;
             }
