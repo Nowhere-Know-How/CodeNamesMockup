@@ -34,7 +34,7 @@ namespace CodeNames
             number = clue_count;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return team.ToString() + ": " + word + ", " + number.ToString();
         }

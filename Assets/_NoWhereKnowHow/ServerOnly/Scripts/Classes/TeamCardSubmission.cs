@@ -25,7 +25,7 @@ namespace CodeNames
             teamColor = team;
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return "Team Color: " + teamColor.ToString() + ", CardIndex: " + cardIndex.ToString();
         }

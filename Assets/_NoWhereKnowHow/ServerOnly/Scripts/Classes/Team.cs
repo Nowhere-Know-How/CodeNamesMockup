@@ -35,7 +35,7 @@ public class Team
         codeMaster = null;
     }
 
-    public string ToString()
+    public override string ToString()
     {
         List<string> playerNames = new List<string>();
         for (int i = 0; i < players.Count; i++)

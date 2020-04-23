@@ -19,5 +19,5 @@ MonoBehaviour:
     _initWithNetworkBehaviorListItems:
     - _createCode: 1
       _name: ForgePlayer
-      _networkBehavior: {fileID: 5795304037991027218, guid: 221ed435f797e2e4e95b0395db61f2f4,
+      _networkBehavior: {fileID: 7439373623351425471, guid: 6b21123222f185f4ab7ff0736025c551,
         type: 3}

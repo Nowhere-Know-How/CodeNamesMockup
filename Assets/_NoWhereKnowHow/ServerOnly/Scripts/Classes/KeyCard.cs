@@ -14,11 +14,11 @@ namespace CodeNames
 
         public KeyCard() { }
 
-        public KeyCard(int id, int firstToMove, string data_string, int size)
+        public KeyCard(int card_id, int teamFirstToMove, string data_string, int length)
         {
-            id = id;
-            firstToMove = firstToMove;
-            size = size;
+            id = card_id;
+            firstToMove = teamFirstToMove;
+            size = length;
 
             string[] d = data_string.Split(',');
             for (int i = 0; i < d.Length; i++)

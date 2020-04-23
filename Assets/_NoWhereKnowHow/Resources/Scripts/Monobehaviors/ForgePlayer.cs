@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using BeardedManStudios.Forge.Networking.Generated;
 using BeardedManStudios.Forge.Networking;
 using ForgeAndUnity.Forge;
+using Invector.vCharacterController;
 
 /// <summary>
 /// Can be controlled by any <see cref="NetworkingPlayer"/> if he has a matching <see cref="PlayerToken"/>.
@@ -22,12 +23,12 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
     public delegate void CheckMultiServerPlayerIdEvent (RpcArgs pArgs);
     public event CheckMultiServerPlayerIdEvent OnCheckPlayerToken;
 
-
     //Functions
     #region Unity
     void Awake () {
 
     }
+    
 
     protected override void NetworkStart () {
         base.NetworkStart();
@@ -41,6 +42,17 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
 
         networkObject.positionInterpolation.Enabled = false;
         networkObject.positionChanged += WarpToFirstValue;
+        networkObject.ownershipChanged += ActivatePlayerControls;
+    }
+
+    void ActivatePlayerControls(NetWorker _)
+    {
+        if (!networkObject.IsOwner){
+            return;
+        }
+
+        vThirdPersonInput invectorInput = GetComponent<vThirdPersonInput>();
+        invectorInput.enabled = true;
     }
 
     void Update () {
@@ -49,14 +61,14 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
         }
 
         if (!networkObject.IsOwner) {
-            transform.position = networkObject.position;
-            transform.rotation = networkObject.rotation;
+            transform.position             = networkObject.position;
+            transform.rotation             = networkObject.rotation;
             return;
         }
 
         ProcessPlayerInput();
-        networkObject.position = transform.position;
-        networkObject.rotation = transform.rotation;
+        networkObject.position        = transform.position;
+        networkObject.rotation        = transform.rotation;
     }
 
     #endregion
@@ -114,13 +126,20 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
 
     #region Helpers
     public void ProcessPlayerInput () {
-        //if (Input.GetKey(KeyCode.W)) {
+        //if (Input.GetKey(KeyCode.W))
+        //{
         //    transform.position = new Vector3(1f, 1f, 1f);
-        //} else if (Input.GetKey(KeyCode.A)) {
+        //}
+        //else if (Input.GetKey(KeyCode.A))
+        //{
         //    transform.position = new Vector3(1f, 1f, 2f);
-        //} else if (Input.GetKey(KeyCode.S)) {
+        //}
+        //else if (Input.GetKey(KeyCode.S))
+        //{
         //    transform.position = new Vector3(1f, 1f, 3f);
-        //} else if (Input.GetKey(KeyCode.D)) {
+        //}
+        //else if (Input.GetKey(KeyCode.D))
+        //{
         //    transform.position = new Vector3(1f, 1f, 4f);
         //}
     }
