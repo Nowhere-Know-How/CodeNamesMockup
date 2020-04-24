@@ -74,8 +74,6 @@ namespace Invector.vCharacterController
 
         protected virtual void InputHandle()
         {
-            //if (Input.GetKeyDown(KeyCode.Z)) { InitilizeController(); }
-
             MoveInput();
             CameraInput();
             SprintInput();

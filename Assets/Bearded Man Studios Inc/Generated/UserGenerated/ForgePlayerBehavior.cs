@@ -4,11 +4,12 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[\"string\"]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[\"token\"]]")]
+	[GeneratedRPC("{\"types\":[[\"string\"][\"string\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"token\"][\"new_name\"]]")]
 	public abstract partial class ForgePlayerBehavior : NetworkBehavior
 	{
 		public const byte RPC_CHECK_PLAYER_TOKEN = 0 + 5;
+		public const byte RPC_SET_PLAYER_NAME = 1 + 5;
 		
 		public ForgePlayerNetworkObject networkObject = null;
 
@@ -23,6 +24,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 			base.SetupHelperRpcs(networkObject);
 			networkObject.RegisterRpc("CheckPlayerToken", CheckPlayerToken, typeof(string));
+			networkObject.RegisterRpc("SetPlayerName", SetPlayerName, typeof(string));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -104,6 +106,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// string token
 		/// </summary>
 		public abstract void CheckPlayerToken(RpcArgs args);
+		/// <summary>
+		/// Arguments:
+		/// string new_name
+		/// </summary>
+		public abstract void SetPlayerName(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

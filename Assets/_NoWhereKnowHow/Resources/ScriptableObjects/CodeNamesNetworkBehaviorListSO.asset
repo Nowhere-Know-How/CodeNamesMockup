@@ -21,3 +21,7 @@ MonoBehaviour:
       _name: ForgePlayer
       _networkBehavior: {fileID: 7439373623351425471, guid: 6b21123222f185f4ab7ff0736025c551,
         type: 3}
+    - _createCode: 2
+      _name: CodeNames
+      _networkBehavior: {fileID: 1334439646404575885, guid: 9df264ce42c28ee4f98218f90e1dc154,
+        type: 3}

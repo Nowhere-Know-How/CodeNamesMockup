@@ -14,7 +14,6 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
     public static string                playerTokenClient;
 
     string                              _playerToken;
-
     public string                       PlayerToken             { get { return _playerToken; } set { _playerToken = value; } }
     public NetworkSceneManager          Manager                 { get; set; }
     public NetworkingPlayer             Player                  { get; set; }
@@ -22,6 +21,9 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
     //Events
     public delegate void CheckMultiServerPlayerIdEvent (RpcArgs pArgs);
     public event CheckMultiServerPlayerIdEvent OnCheckPlayerToken;
+
+    public delegate void UnityEvent(string new_name);
+    public event UnityEvent OnPlayerNameChange;
 
     //Functions
     #region Unity
@@ -126,6 +128,13 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
 
     #region Helpers
     public void ProcessPlayerInput () {
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            networkObject.SendRpc(RPC_SET_PLAYER_NAME, Receivers.AllBuffered, "Not a Jill");
+        }
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+        }
         //if (Input.GetKey(KeyCode.W))
         //{
         //    transform.position = new Vector3(1f, 1f, 1f);
@@ -161,6 +170,16 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
         if (OnCheckPlayerToken != null) {
             OnCheckPlayerToken(pArgs);
         }
+    }
+
+    public override void SetPlayerName(RpcArgs args)
+    {
+        string _playerName = args.GetNext<string>();
+        Debug.Log("name changed to " + _playerName);
+        OnPlayerNameChange(_playerName);
+
+        //CapsuleCollider collider = GetComponent<CapsuleCollider>();
+        //collider.enabled = true;
     }
 
     #endregion
