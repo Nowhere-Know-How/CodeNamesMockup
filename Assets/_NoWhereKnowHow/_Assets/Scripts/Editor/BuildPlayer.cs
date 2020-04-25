@@ -21,7 +21,7 @@ public class BuildPlayer
             @"Assets\_NoWhereKnowHow\_Assets\Scenes\Template_Lobby.unity",
         };
 
-    static string data_dir = out_dir + project_name + "_Data/Data/";
+    static string data_dir = out_dir + project_name + "_Data/_NoWhereKnowHow/Data/";
     static string sqlite_db_path = @"Assets\_NoWhereKnowHow\Data\";
     static string sqlite_db_file = "codenames.db";
 

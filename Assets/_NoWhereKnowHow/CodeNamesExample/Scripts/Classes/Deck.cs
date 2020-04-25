@@ -21,6 +21,20 @@ namespace CodeNames
             get { return cards.Count; }
         }
 
+        public string AllCardData
+        {
+            get {
+                List<string> card_data = new List<string>();
+                for (int i = 0; i < allCards.Count; i++)
+                {
+                    card_data.Add(allCards[i].Text);
+                }
+
+                return string.Join<string>(",", card_data);
+            }
+            
+        }
+
         public Card DealCard()
         {
             Card firstCard = cards[0];
@@ -39,5 +53,7 @@ namespace CodeNames
         {
             cards = new List<Card>(allCards);
         }
+
+        
     }
 }

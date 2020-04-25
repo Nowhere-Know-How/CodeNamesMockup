@@ -28,7 +28,7 @@ namespace CodeNames
             {
                 t = transform;
             }
-            GameControllers playerBehavior = _manager.InstantiateNetworkBehavior(networkBehaviorName, null, t.position, t.rotation) as GameControllers;
+            RPCGuy playerBehavior = _manager.InstantiateNetworkBehavior(networkBehaviorName, null, t.position, t.rotation) as RPCGuy;
         }
 
     }

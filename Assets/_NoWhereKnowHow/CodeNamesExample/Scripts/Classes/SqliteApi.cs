@@ -12,7 +12,7 @@ namespace CodeNames
     {
         protected SqliteApi() { }
 
-        public static string connectionString = "URI=file:" + Path.Combine(new string[] { Application.dataPath, "Data", "codenames.db" });
+        public static string connectionString = "URI=file:" + Path.Combine(new string[] { Application.dataPath, "_NoWhereKnowHow", "Data", "codenames.db" });
 
 
         public static KeyCard GetRandomKeyCard()

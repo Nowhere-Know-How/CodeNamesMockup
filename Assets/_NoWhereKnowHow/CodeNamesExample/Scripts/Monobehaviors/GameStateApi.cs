@@ -8,25 +8,20 @@ namespace CodeNames
 {
     public class GameStateApi : SingletonBehaviour<GameStateApi>
     {
-        public int guessesLeft = -1;
-
         int minPlayersRequired = 4;
 
+        bool isEventListenersInited = false;
         Deck deck; //The deck is considered the playing field. Unused cards exist in the SQLite DB
         KeyCard keyCard;
-        
         int CardsToWinTeamRed;
-        Team redTeam = new Team();
-
         int CardsToWinTeamBlue;
+        Team redTeam = new Team();
         Team blueTeam = new Team();
-
         CardColor teamWithFirstTurn;
 
+        int guessesLeft = -1;
         Clue lastClue;
 
-        bool isEventListenersInited = false;
-        
         public CardColor TeamWithFirstTurn
         {
             get { return teamWithFirstTurn; }
@@ -38,7 +33,7 @@ namespace CodeNames
             Debug.Log(Environment.GetEnvironmentVariable("PRODUCTION"));
         }
 
-        public void InitEventListeners()
+        void InitEventListeners()
         {
             if (!isEventListenersInited)
             {
@@ -50,11 +45,11 @@ namespace CodeNames
             }
         }
 
-        private GameStateApi()
+        GameStateApi()
         {
         }
 
-        private void HandleCodeMasterSubmission(Clue clue)
+        void HandleCodeMasterSubmission(Clue clue)
         {
             lastClue = clue;
             if (clue.Number <= 0)
@@ -82,14 +77,14 @@ namespace CodeNames
 
         }
 
-        private void HandleTeamSubmission(TeamCardSubmission submission)
+        void HandleTeamSubmission(TeamCardSubmission submission)
         {
             //Debug.Log("Team Submission received by Game Manager: " + submission.ToString());
             RevealCardResolutions revealResolution = RevealCard(submission.CardIndex);
             HandleRevealCardResolution(revealResolution, submission.TeamColor);
         }
 
-        public void HandleRevealCardResolution(RevealCardResolutions revealResolution, CardColor teamColor)
+        void HandleRevealCardResolution(RevealCardResolutions revealResolution, CardColor teamColor)
         {
             switch (revealResolution)
             {
@@ -224,7 +219,7 @@ namespace CodeNames
 
 
 
-        private void HandleStateChange(GameState gs)
+        void HandleStateChange(GameState gs)
         {
             //Debug.Log("GAME STATE CHANGED: " + gs.ToString());
             switch (gs)
@@ -290,7 +285,7 @@ namespace CodeNames
         }
 
 
-        private void InitializeScore()
+        void InitializeScore()
         {
             Debug.Log("Initializing Score...");
             Debug.Assert(keyCard.data.Count == deck.Count);
@@ -325,7 +320,7 @@ namespace CodeNames
             Debug.Log("Cards Left to Win: " + "\nRed - " + CardsToWinTeamRed.ToString() + ", Blue - " + CardsToWinTeamBlue.ToString());
         }
 
-        private RevealCardResolutions RevealCard(CardChoice cardChoice) //Reveals the card at the index of the deck
+        RevealCardResolutions RevealCard(CardChoice cardChoice) //Reveals the card at the index of the deck
         {
             try
             {
@@ -363,16 +358,16 @@ namespace CodeNames
 
         }
 
-        private KeyCard KeyCard
+        public KeyCard KeyCard
         {
             get { return keyCard; }
         }
-        private void DrawNewDeck()
+        public void DrawNewDeck()
         {
             LoadDeckFromDB();
         }
 
-        private Deck Deck
+        public Deck Deck
         {
             get { return deck; }
         }
@@ -383,7 +378,7 @@ namespace CodeNames
             keyCard = SqliteApi.GetRandomKeyCard();
         }
 
-        private void LoadDeckFromDB()
+        public void LoadDeckFromDB()
         {
             Debug.Log("Drawing Cards for the Deck");
             deck = new Deck();
@@ -395,7 +390,7 @@ namespace CodeNames
             Debug.Log("Words in Deck: " + String.Join(", ", words.ToArray()));
         }
 
-        private void PrintScore()
+        public void PrintScore()
         {
             Debug.Log("Cards Left to Win: " + "\nRed - " + CardsToWinTeamRed.ToString() + ", Blue - " + CardsToWinTeamBlue.ToString());
         }
