@@ -668,7 +668,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Start as Node_1 \n(MasterNode)"
+  m_Text: 'Start Server
+
+    (Node_1)'
 --- !u!224 &5546117042175729302
 RectTransform:
   m_ObjectHideFlags: 0

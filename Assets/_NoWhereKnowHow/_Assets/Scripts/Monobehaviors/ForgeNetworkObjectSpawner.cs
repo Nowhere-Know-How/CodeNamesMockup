@@ -7,6 +7,9 @@ namespace CodeNames
 {
     public class ForgeNetworkObjectSpawner : MonoBehaviour
     {
+        public string networkBehaviorName;
+        public Transform t;
+
         NetworkSceneManager _manager;
         void Start()
         {
@@ -21,7 +24,11 @@ namespace CodeNames
                 return;
             }
 
-            GameControllers playerBehavior = _manager.InstantiateNetworkBehavior("GameControllers", null, transform.position, transform.rotation) as GameControllers;
+            if (t == null)
+            {
+                t = transform;
+            }
+            GameControllers playerBehavior = _manager.InstantiateNetworkBehavior(networkBehaviorName, null, t.position, t.rotation) as GameControllers;
         }
 
     }

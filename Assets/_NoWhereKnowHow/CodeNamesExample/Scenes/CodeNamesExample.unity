@@ -306,7 +306,7 @@ GameObject:
   m_Component:
   - component: {fileID: 987032243}
   m_Layer: 0
-  m_Name: ---------------------Configurations---------------------------
+  m_Name: Configs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -337,7 +337,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1349614828}
   m_Layer: 0
-  m_Name: ---------------------Game Objects----------------------------
+  m_Name: Environment
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

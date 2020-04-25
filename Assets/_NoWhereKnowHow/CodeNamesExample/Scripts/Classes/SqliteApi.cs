@@ -14,8 +14,10 @@ namespace CodeNames
 
         public static string connectionString = "URI=file:" + Path.Combine(new string[] { Application.dataPath, "Data", "codenames.db" });
 
+
         public static KeyCard GetRandomKeyCard()
         {
+            Debug.Log(connectionString);
             IDbConnection dbcon = new SqliteConnection(connectionString);
             dbcon.Open();
             IDbCommand dbcmd = dbcon.CreateCommand();
