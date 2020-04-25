@@ -34,6 +34,8 @@ namespace CodeNames
         void Awake()
         {
             InitEventListeners();
+            Debug.Log("ENV");
+            Debug.Log(Environment.GetEnvironmentVariable("PRODUCTION"));
         }
 
         public void InitEventListeners()
