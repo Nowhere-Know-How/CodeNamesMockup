@@ -45,6 +45,13 @@ namespace CodeNames
             }
         }
 
+        void OnDestroy()
+        {
+            EventManager.onGameStateChange.RemoveListener(HandleStateChange);
+            EventManager.onForwardedTeamSubmission.RemoveListener(HandleTeamSubmission);
+            EventManager.onForwardedCodeMasterSubmission.RemoveListener(HandleCodeMasterSubmission);
+        }
+
         GameStateApi()
         {
         }

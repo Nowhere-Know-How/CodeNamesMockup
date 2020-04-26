@@ -15,6 +15,11 @@ public class ForgeBufferedData : MonoBehaviour
         forgePlayer.OnPlayerNameChange += ChangeName;
     }
 
+    void OnDestroy()
+    {
+        forgePlayer.OnPlayerNameChange -= ChangeName;
+    }
+
     void ChangeName(string newName)
     {
         textMeshPro.text = newName;

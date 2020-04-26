@@ -10,6 +10,7 @@ namespace BeardedManStudios.Forge.Networking.Unity
 		public event InstantiateEvent objectInitialized;
 		protected BMSByte metadata = new BMSByte();
 
+		public GameObject[] BillboardNetworkObject = null;
 		public GameObject[] ChatManagerNetworkObject = null;
 		public GameObject[] CodeNamesGameStateNetworkObject = null;
 		public GameObject[] CubeForgeGameNetworkObject = null;
@@ -37,7 +38,30 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			if (obj.CreateCode < 0)
 				return;
 				
-			if (obj is ChatManagerNetworkObject)
+			if (obj is BillboardNetworkObject)
+			{
+				MainThreadManager.Run(() =>
+				{
+					NetworkBehavior newObj = null;
+					if (!NetworkBehavior.skipAttachIds.TryGetValue(obj.NetworkId, out newObj))
+					{
+						if (BillboardNetworkObject.Length > 0 && BillboardNetworkObject[obj.CreateCode] != null)
+						{
+							var go = Instantiate(BillboardNetworkObject[obj.CreateCode]);
+							newObj = go.GetComponent<BillboardBehavior>();
+						}
+					}
+
+					if (newObj == null)
+						return;
+						
+					newObj.Initialize(obj);
+
+					if (objectInitialized != null)
+						objectInitialized(newObj, obj);
+				});
+			}
+			else if (obj is ChatManagerNetworkObject)
 			{
 				MainThreadManager.Run(() =>
 				{
@@ -277,6 +301,18 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			obj.pendingInitialized -= InitializedObject;
 		}
 
+		[Obsolete("Use InstantiateBillboard instead, its shorter and easier to type out ;)")]
+		public BillboardBehavior InstantiateBillboardNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			var go = Instantiate(BillboardNetworkObject[index]);
+			var netBehavior = go.GetComponent<BillboardBehavior>();
+			var obj = netBehavior.CreateNetworkObject(Networker, index);
+			go.GetComponent<BillboardBehavior>().networkObject = (BillboardNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
 		[Obsolete("Use InstantiateChatManager instead, its shorter and easier to type out ;)")]
 		public ChatManagerBehavior InstantiateChatManagerNetworkObject(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
 		{
@@ -398,6 +434,63 @@ namespace BeardedManStudios.Forge.Networking.Unity
 			return netBehavior;
 		}
 
+		/// <summary>
+		/// Instantiate an instance of Billboard
+		/// </summary>
+		/// <returns>
+		/// A local instance of BillboardBehavior
+		/// </returns>
+		/// <param name="index">The index of the Billboard prefab in the NetworkManager to Instantiate</param>
+		/// <param name="position">Optional parameter which defines the position of the created GameObject</param>
+		/// <param name="rotation">Optional parameter which defines the rotation of the created GameObject</param>
+		/// <param name="sendTransform">Optional Parameter to send transform data to other connected clients on Instantiation</param>
+		public BillboardBehavior InstantiateBillboard(int index = 0, Vector3? position = null, Quaternion? rotation = null, bool sendTransform = true)
+		{
+			if (BillboardNetworkObject.Length <= index)
+			{
+				Debug.Log("Prefab(s) missing for: Billboard. Add them at the NetworkManager prefab.");
+				return null;
+			}
+			
+			var go = Instantiate(BillboardNetworkObject[index]);
+			var netBehavior = go.GetComponent<BillboardBehavior>();
+
+			NetworkObject obj = null;
+			if (!sendTransform && position == null && rotation == null)
+				obj = netBehavior.CreateNetworkObject(Networker, index);
+			else
+			{
+				metadata.Clear();
+
+				if (position == null && rotation == null)
+				{
+					byte transformFlags = 0x1 | 0x2;
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+					ObjectMapper.Instance.MapBytes(metadata, go.transform.position, go.transform.rotation);
+				}
+				else
+				{
+					byte transformFlags = 0x0;
+					transformFlags |= (byte)(position != null ? 0x1 : 0x0);
+					transformFlags |= (byte)(rotation != null ? 0x2 : 0x0);
+					ObjectMapper.Instance.MapBytes(metadata, transformFlags);
+
+					if (position != null)
+						ObjectMapper.Instance.MapBytes(metadata, position.Value);
+
+					if (rotation != null)
+						ObjectMapper.Instance.MapBytes(metadata, rotation.Value);
+				}
+
+				obj = netBehavior.CreateNetworkObject(Networker, index, metadata.CompressBytes());
+			}
+
+			go.GetComponent<BillboardBehavior>().networkObject = (BillboardNetworkObject)obj;
+
+			FinalizeInitialization(go, netBehavior, obj, position, rotation, sendTransform);
+			
+			return netBehavior;
+		}
 		/// <summary>
 		/// Instantiate an instance of ChatManager
 		/// </summary>

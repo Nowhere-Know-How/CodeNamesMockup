@@ -94,7 +94,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 796b9c7d4b207a44288c8d99f3e3d5c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  guessesLeft: -1
 --- !u!1 &7743174641332314310
 GameObject:
   m_ObjectHideFlags: 0

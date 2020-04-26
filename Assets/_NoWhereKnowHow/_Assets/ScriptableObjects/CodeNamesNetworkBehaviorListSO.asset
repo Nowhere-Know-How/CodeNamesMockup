@@ -25,3 +25,7 @@ MonoBehaviour:
       _name: GameControllers
       _networkBehavior: {fileID: 7256086775585412656, guid: 22ded4807bcb65648b34d4f27cab23c4,
         type: 3}
+    - _createCode: 3
+      _name: Billboard
+      _networkBehavior: {fileID: 7007515652948270364, guid: 8314bd309d66276489cdc9d2d977bca6,
+        type: 3}

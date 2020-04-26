@@ -4,17 +4,13 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][\"bool\"][][\"string\"][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[][\"render\"][][\"CardWords\"][]]")]
-	public abstract partial class CodeNamesGameStateBehavior : NetworkBehavior
+	[GeneratedRPC("{\"types\":[[\"string\"]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[\"text\"]]")]
+	public abstract partial class BillboardBehavior : NetworkBehavior
 	{
-		public const byte RPC_START_CODE_NAMES = 0 + 5;
-		public const byte RPC_TOGGLE_DISPLAY = 1 + 5;
-		public const byte RPC_DRAW_NEW_DECK = 2 + 5;
-		public const byte RPC_SET_CARD_WORDS = 3 + 5;
-		public const byte RPC_END_CODE_NAMES = 4 + 5;
+		public const byte RPC_SET_TEXT = 0 + 5;
 		
-		public CodeNamesGameStateNetworkObject networkObject = null;
+		public BillboardNetworkObject networkObject = null;
 
 		public override void Initialize(NetworkObject obj)
 		{
@@ -22,15 +18,11 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			if (networkObject != null && networkObject.AttachedBehavior != null)
 				return;
 			
-			networkObject = (CodeNamesGameStateNetworkObject)obj;
+			networkObject = (BillboardNetworkObject)obj;
 			networkObject.AttachedBehavior = this;
 
 			base.SetupHelperRpcs(networkObject);
-			networkObject.RegisterRpc("StartCodeNames", StartCodeNames);
-			networkObject.RegisterRpc("ToggleDisplay", ToggleDisplay, typeof(bool));
-			networkObject.RegisterRpc("DrawNewDeck", DrawNewDeck);
-			networkObject.RegisterRpc("SetCardWords", SetCardWords, typeof(string));
-			networkObject.RegisterRpc("EndCodeNames", EndCodeNames);
+			networkObject.RegisterRpc("SetText", SetText, typeof(string));
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -88,7 +80,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		public override void Initialize(NetWorker networker, byte[] metadata = null)
 		{
-			Initialize(new CodeNamesGameStateNetworkObject(networker, createCode: TempAttachCode, metadata: metadata));
+			Initialize(new BillboardNetworkObject(networker, createCode: TempAttachCode, metadata: metadata));
 		}
 
 		private void DestroyGameObject(NetWorker sender)
@@ -99,7 +91,7 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		public override NetworkObject CreateNetworkObject(NetWorker networker, int createCode, byte[] metadata = null)
 		{
-			return new CodeNamesGameStateNetworkObject(networker, this, createCode, metadata);
+			return new BillboardNetworkObject(networker, this, createCode, metadata);
 		}
 
 		protected override void InitializedTransform()
@@ -109,24 +101,9 @@ namespace BeardedManStudios.Forge.Networking.Generated
 
 		/// <summary>
 		/// Arguments:
+		/// string text
 		/// </summary>
-		public abstract void StartCodeNames(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// </summary>
-		public abstract void ToggleDisplay(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// </summary>
-		public abstract void DrawNewDeck(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// </summary>
-		public abstract void SetCardWords(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// </summary>
-		public abstract void EndCodeNames(RpcArgs args);
+		public abstract void SetText(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

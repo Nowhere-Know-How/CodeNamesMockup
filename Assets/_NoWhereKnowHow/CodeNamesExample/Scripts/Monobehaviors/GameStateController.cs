@@ -44,6 +44,13 @@ namespace CodeNames
                 isEventListenersInited = true;
             }
         }
+        void OnDestroy()
+        {
+            EventManager.onGameStateApiDone.RemoveListener(HandleGameStateApiDone);
+            EventManager.onGameStateControllerChange.RemoveListener(HandleControllerStateChange);
+            EventManager.onCodeMasterSubmission.RemoveListener(HandleCodeMasterSubmission);
+            EventManager.onTeamSubmission.RemoveListener(HandleTeamSubmission);
+        }
 
         private void HandleTeamSubmission(TeamCardSubmission submission)
         {
