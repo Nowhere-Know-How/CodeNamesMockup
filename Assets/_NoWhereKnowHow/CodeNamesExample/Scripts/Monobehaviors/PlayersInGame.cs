@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class PlayersInGame:MonoBehaviour
+public class PlayersInGame : MonoBehaviour
 {
     public static List<Player> online = new List<Player>();
 
-    private void Awake()
+    void Awake()
     {
         if (Environment.GetEnvironmentVariable("PRODUCTION") == "true")
         {
@@ -16,13 +16,36 @@ public class PlayersInGame:MonoBehaviour
         else //development
         {
             online.Clear();
-            online.Add(new Player("Arash", "male1"));
-            online.Add(new Player("Josh", "female1"));
-            online.Add(new Player("Brandon", "male2"));
-            online.Add(new Player("Jessica", "female2"));
-            online.Add(new Player("Helen", "female3"));
-            online.Add(new Player("Wei", "female4"));
-            online.Add(new Player("Bao", "female1"));
+            Add(new Player("Arash", "male1"));
+            Add(new Player("Josh", "female1"));
+            Add(new Player("Brandon", "male2"));
+            Add(new Player("Jessica", "female2"));
+            Add(new Player("Helen", "female3"));
+            Add(new Player("Wei", "female4"));
+            Add(new Player("Bao", "female1"));
+            Add(new Player("Maki", "female1"));
+            Add(new Player("Koikoi", "female1"));
+            Add(new Player("Keikei", "female1"));
+            Add(new Player("Kiki", "female1"));
+            Add(new Player("Lychee", "female1"));
+        }
+    }
+
+    public static void Add(Player p)
+    {
+        online.Add(p);
+    }
+
+
+    public static string Players{
+        get
+        {
+            List<string> allNames = new List<string>();
+            for (int i = 0; i < online.Count; i++)
+            {
+                allNames.Add(online[i].playerName);
+            }
+            return string.Join("\n", allNames.ToArray());
         }
     }
 

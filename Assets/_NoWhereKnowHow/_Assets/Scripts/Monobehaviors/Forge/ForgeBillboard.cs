@@ -15,6 +15,11 @@ public class ForgeBillboard : BillboardBehavior
         text = GetComponentInChildren<TextMeshPro>();
     }
 
+    public void SetText(string t)
+    {
+        networkObject.SendRpc(RPC_SET_TEXT, Receivers.AllBuffered, new object[] { t });
+    }
+
     #region RPC-Callbacks
     public override void SetText(RpcArgs args)
     {

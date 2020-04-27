@@ -12,6 +12,7 @@ namespace CodeNames
     public class RPCGuy : CodeNamesGameStateBehavior
     {
         public List<string> cards;
+        public Transform playerListBillboard;
         public Transform announcerBillboard;
 
         public GameObject codeNamesControllerPrefab;
@@ -23,6 +24,7 @@ namespace CodeNames
         bool gameInstanceExists = false;
         GameObject codeNamesObject;
         ForgeBillboard billboardNetworkObject;
+        ForgeBillboard playerListBillboardNetworkObject;
 
         private void Start()
         {
@@ -51,7 +53,12 @@ namespace CodeNames
             {
                 case GameState.INIT_DONE:
                     api = codeNamesObject.GetComponentInChildren<GameStateApi>();
-                    networkObject.SendRpc(RPC_SEND_CARD_WORDS_TO_CLIENT, Receivers.Others, new object[] { api.Deck.AllCardData });
+                    networkObject.SendRpc(RPC_SEND_CARD_WORDS_TO_CLIENT, Receivers.OthersBuffered, new object[] { api.Deck.AllCardData });
+                    break;
+
+                case GameState.PICK_TEAMS_DONE_BLUE_TO_START:
+                case GameState.PICK_TEAMS_DONE_RED_TO_START:
+                    playerListBillboardNetworkObject.SetText(PlayersInGame.Players);
                     break;
 
                 default:
@@ -110,6 +117,7 @@ namespace CodeNames
                 players = playerListObject.GetComponent<PlayersInGame>();
                 codeNamesObject = (GameObject)Instantiate(codeNamesControllerPrefab, transform.position, Quaternion.identity);
                 billboardNetworkObject = _manager.InstantiateNetworkBehavior("Billboard", null, announcerBillboard.position, announcerBillboard.rotation) as ForgeBillboard;
+                playerListBillboardNetworkObject = _manager.InstantiateNetworkBehavior("Billboard", null, playerListBillboard.position, playerListBillboard.rotation) as ForgeBillboard;
                 gameInstanceExists = true;
             }
         }
@@ -126,8 +134,9 @@ namespace CodeNames
                 GameObject.Destroy(players.gameObject);
                 GameObject.Destroy(codeNamesObject);
                 billboardNetworkObject.networkObject.Destroy();
+                playerListBillboardNetworkObject.networkObject.Destroy();
                 gameInstanceExists = false;
-                networkObject.SendRpc(RPC_DEACTIVATE_GAME_OBJECTS_ON_CLIENT, Receivers.Others);
+                networkObject.SendRpc(RPC_DEACTIVATE_GAME_OBJECTS_ON_CLIENT, Receivers.OthersBuffered);
 
             }
         }
