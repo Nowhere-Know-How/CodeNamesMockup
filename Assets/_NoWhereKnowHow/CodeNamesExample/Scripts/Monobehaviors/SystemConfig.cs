@@ -7,7 +7,7 @@ public class SystemConfig : MonoBehaviour
 {
     private void Awake()
     {
-        Environment.SetEnvironmentVariable("PRODUCTION", "false");
+        Environment.SetEnvironmentVariable("PRODUCTION", "true");
     }
 
 }

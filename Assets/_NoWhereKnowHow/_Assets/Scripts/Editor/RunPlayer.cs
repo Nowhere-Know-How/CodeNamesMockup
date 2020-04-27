@@ -38,7 +38,34 @@ public class RunPlayer
         }
     }
 
-   
-    #endif
+    [MenuItem("Run/Latest 5x %t")]
+    public static void Run5xLatestBuild()
+    {
+        try
+        {
+            Process myProcess = new Process();
+            myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            myProcess.StartInfo.CreateNoWindow = true;
+            myProcess.StartInfo.UseShellExecute = false;
+            myProcess.StartInfo.FileName = "C:\\Windows\\system32\\cmd.exe";
+            string path = exe_name;
+            myProcess.StartInfo.Arguments = "/c" + path;
+            myProcess.EnableRaisingEvents = true;
+            myProcess.Start();
+            myProcess.Start();
+            myProcess.Start();
+            myProcess.Start();
+            myProcess.Start();
+            //myProcess.WaitForExit();
+            //int ExitCode = myProcess.ExitCode;
+            //print(ExitCode);
+        }
+        catch (System.Exception e)
+        {
+            UnityEngine.Debug.Log(e);
+        }
+    }
+
+#endif
 
 }

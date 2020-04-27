@@ -5,13 +5,13 @@ using UnityEngine;
 [System.Serializable]
 public class Player
 {
-    public string playerName;
-    public string prefabString;
+    string playerName;
+    int id;
 
-    public Player(string name, string prefab)
+    public Player(string name, int networkId)
     {
         playerName = name;
-        prefab = prefabString;
+        id = networkId;
     }
 
     public string PlayerName
@@ -20,10 +20,10 @@ public class Player
         set { playerName = value; }
     }
 
-    public string PrefabString
+    public int PrefabString
     {
-        get { return prefabString; }
-        set { prefabString = value; }
+        get { return id; }
+        set { id = value; }
     }
 
 }

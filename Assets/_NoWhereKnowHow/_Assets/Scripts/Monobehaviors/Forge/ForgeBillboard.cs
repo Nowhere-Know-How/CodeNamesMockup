@@ -15,6 +15,14 @@ public class ForgeBillboard : BillboardBehavior
         text = GetComponentInChildren<TextMeshPro>();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            SetText("Hello. This is Jill from E7.");
+        }
+    }
+
     public void SetText(string t)
     {
         networkObject.SendRpc(RPC_SET_TEXT, Receivers.AllBuffered, new object[] { t });
@@ -23,6 +31,7 @@ public class ForgeBillboard : BillboardBehavior
     #region RPC-Callbacks
     public override void SetText(RpcArgs args)
     {
+        Debug.Log("I AM A BUFFERED ALL RPC");
         string s = args.GetNext<string>();
         text.text = s;
     }

@@ -40,7 +40,7 @@ public class Team
         List<string> playerNames = new List<string>();
         for (int i = 0; i < players.Count; i++)
         {
-            playerNames.Add(players[i].playerName);
+            playerNames.Add(players[i].PlayerName);
         }
         return String.Join(", ", playerNames.ToArray());
     }

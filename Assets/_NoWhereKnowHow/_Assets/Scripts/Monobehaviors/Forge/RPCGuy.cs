@@ -4,8 +4,8 @@ using UnityEngine;
 using BeardedManStudios.Forge.Networking.Generated;
 using BeardedManStudios.Forge.Networking;
 using ForgeAndUnity.Forge;
-using System;
-using BeardedManStudios.Forge.Networking.Unity;
+using UnityEngine.SceneManagement;
+
 
 namespace CodeNames
 {
@@ -16,15 +16,12 @@ namespace CodeNames
         public Transform announcerBillboard;
 
         public GameObject codeNamesControllerPrefab;
-        public GameObject playerListPrefab;
         public PlayersInGame players;
         GameStateApi api;
         NetworkSceneManager _manager;
 
         bool gameInstanceExists = false;
         GameObject codeNamesObject;
-        ForgeBillboard billboardNetworkObject;
-        ForgeBillboard playerListBillboardNetworkObject;
 
         private void Start()
         {
@@ -32,6 +29,7 @@ namespace CodeNames
             {
                 return;
             }
+            Debug.Log(gameObject.scene.name);
             _manager = NodeManager.Instance.FindNetworkSceneManager(gameObject.scene.name);
 
             if (_manager == null || !_manager.HasNetworker)
@@ -54,11 +52,17 @@ namespace CodeNames
                 case GameState.INIT_DONE:
                     api = codeNamesObject.GetComponentInChildren<GameStateApi>();
                     networkObject.SendRpc(RPC_SEND_CARD_WORDS_TO_CLIENT, Receivers.OthersBuffered, new object[] { api.Deck.AllCardData });
+
+                    
+                    //_manager.Networker.IteratePlayers((player) =>
+                    //{
+                    //    Debug.Log(player.NetworkId);
+                    //});
                     break;
 
                 case GameState.PICK_TEAMS_DONE_BLUE_TO_START:
                 case GameState.PICK_TEAMS_DONE_RED_TO_START:
-                    playerListBillboardNetworkObject.SetText(PlayersInGame.Players);
+                    //networkObject.SendRpc(RPC_SEND_PLAYER_LIST_TO_CLIENT, Receivers.OthersBuffered, new object[] { players.Players });
                     break;
 
                 default:
@@ -75,10 +79,7 @@ namespace CodeNames
                 return;
             }
 
-            if (Environment.GetEnvironmentVariable("PRODUCTION") != "true")
-            {
-                DevInputs();
-            }
+            DevInputs();
         }
 
         void DevInputs()
@@ -113,11 +114,9 @@ namespace CodeNames
 
             if (!gameInstanceExists)
             {
-                GameObject playerListObject = (GameObject)Instantiate(playerListPrefab, transform.position, Quaternion.identity);
-                players = playerListObject.GetComponent<PlayersInGame>();
                 codeNamesObject = (GameObject)Instantiate(codeNamesControllerPrefab, transform.position, Quaternion.identity);
-                billboardNetworkObject = _manager.InstantiateNetworkBehavior("Billboard", null, announcerBillboard.position, announcerBillboard.rotation) as ForgeBillboard;
-                playerListBillboardNetworkObject = _manager.InstantiateNetworkBehavior("Billboard", null, playerListBillboard.position, playerListBillboard.rotation) as ForgeBillboard;
+                SceneManager.MoveGameObjectToScene(codeNamesObject, SceneManager.GetSceneByName("Lobby"));
+
                 gameInstanceExists = true;
             }
         }
@@ -131,16 +130,12 @@ namespace CodeNames
 
             if (gameInstanceExists)
             {
-                GameObject.Destroy(players.gameObject);
                 GameObject.Destroy(codeNamesObject);
-                billboardNetworkObject.networkObject.Destroy();
-                playerListBillboardNetworkObject.networkObject.Destroy();
                 gameInstanceExists = false;
                 networkObject.SendRpc(RPC_DEACTIVATE_GAME_OBJECTS_ON_CLIENT, Receivers.OthersBuffered);
 
             }
         }
-
         public override void SendCardWordsToClient(RpcArgs args)
         {
             string card_words = args.GetNext<string>();

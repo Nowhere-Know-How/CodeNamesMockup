@@ -241,31 +241,31 @@ namespace CodeNames
 
                 #region GAMESTATE PICK TEAMS
                 case GameState.PICK_TEAMS:
-                    Debug.Log("Players Online: " + PlayersInGame.online.Count.ToString());
+                    PlayersInGame players = GetComponent<PlayersInGame>();
+                    Debug.Log("Players Online: " + players.Online.Count.ToString());
                     redTeam.Clear();
                     blueTeam.Clear();
-                    if (PlayersInGame.online.Count < minPlayersRequired)
+                    if (players.Online.Count < minPlayersRequired)
                     {
-                        throw new System.NotImplementedException("CodeNames needs at least " + minPlayersRequired.ToString() + " people to play");
+                        throw new Exception("ERROR: CodeNames needs at least " + minPlayersRequired.ToString() + " people to play");
                     }
 
-                    PlayersInGame.ShufflePlayers();
-                    for (int i = 0; i < PlayersInGame.online.Count; i++)
+                    players.ShufflePlayers();
+                    for (int i = 0; i < players.Online.Count; i++)
                     {
                         if (i % 2 == 0)
                         {
-                            redTeam.AddPlayer(PlayersInGame.online[i]);
+                            redTeam.AddPlayer(players.Online[i]);
                         }
                         else
                         {
-                            blueTeam.AddPlayer(PlayersInGame.online[i]);
+                            blueTeam.AddPlayer(players.Online[i]);
                         }
                     }
 
                     redTeam.PickCodeMaster();
                     blueTeam.PickCodeMaster();
 
-                    Debug.Log("Teams picked");
                     Debug.Log("Red Team: " + redTeam.ToString());
                     Debug.Log("Red CodeMaster: " + redTeam.CodeMaster.PlayerName);
                     Debug.Log("Blue Team: " + blueTeam.ToString());
