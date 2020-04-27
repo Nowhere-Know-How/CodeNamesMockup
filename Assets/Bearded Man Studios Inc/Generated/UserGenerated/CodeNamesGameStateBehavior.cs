@@ -4,15 +4,14 @@ using UnityEngine;
 
 namespace BeardedManStudios.Forge.Networking.Generated
 {
-	[GeneratedRPC("{\"types\":[[][\"bool\"][][\"string\"][]]")]
-	[GeneratedRPCVariableNames("{\"types\":[[][\"render\"][][\"CardWords\"][]]")]
+	[GeneratedRPC("{\"types\":[[][][\"string\"][]]")]
+	[GeneratedRPCVariableNames("{\"types\":[[][][\"CardWords\"][]]")]
 	public abstract partial class CodeNamesGameStateBehavior : NetworkBehavior
 	{
-		public const byte RPC_START_CODE_NAMES = 0 + 5;
-		public const byte RPC_TOGGLE_DISPLAY = 1 + 5;
-		public const byte RPC_DRAW_NEW_DECK = 2 + 5;
-		public const byte RPC_SET_CARD_WORDS = 3 + 5;
-		public const byte RPC_END_CODE_NAMES = 4 + 5;
+		public const byte RPC_START_CODE_NAMES_ON_SERVER = 0 + 5;
+		public const byte RPC_END_CODE_NAMES_ON_SERVER = 1 + 5;
+		public const byte RPC_SEND_CARD_WORDS_TO_CLIENT = 2 + 5;
+		public const byte RPC_DEACTIVATE_GAME_OBJECTS_ON_CLIENT = 3 + 5;
 		
 		public CodeNamesGameStateNetworkObject networkObject = null;
 
@@ -26,11 +25,10 @@ namespace BeardedManStudios.Forge.Networking.Generated
 			networkObject.AttachedBehavior = this;
 
 			base.SetupHelperRpcs(networkObject);
-			networkObject.RegisterRpc("StartCodeNames", StartCodeNames);
-			networkObject.RegisterRpc("ToggleDisplay", ToggleDisplay, typeof(bool));
-			networkObject.RegisterRpc("DrawNewDeck", DrawNewDeck);
-			networkObject.RegisterRpc("SetCardWords", SetCardWords, typeof(string));
-			networkObject.RegisterRpc("EndCodeNames", EndCodeNames);
+			networkObject.RegisterRpc("StartCodeNamesOnServer", StartCodeNamesOnServer);
+			networkObject.RegisterRpc("EndCodeNamesOnServer", EndCodeNamesOnServer);
+			networkObject.RegisterRpc("SendCardWordsToClient", SendCardWordsToClient, typeof(string));
+			networkObject.RegisterRpc("DeactivateGameObjectsOnClient", DeactivateGameObjectsOnClient);
 
 			networkObject.onDestroy += DestroyGameObject;
 
@@ -110,23 +108,19 @@ namespace BeardedManStudios.Forge.Networking.Generated
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void StartCodeNames(RpcArgs args);
+		public abstract void StartCodeNamesOnServer(RpcArgs args);
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void ToggleDisplay(RpcArgs args);
+		public abstract void EndCodeNamesOnServer(RpcArgs args);
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void DrawNewDeck(RpcArgs args);
+		public abstract void SendCardWordsToClient(RpcArgs args);
 		/// <summary>
 		/// Arguments:
 		/// </summary>
-		public abstract void SetCardWords(RpcArgs args);
-		/// <summary>
-		/// Arguments:
-		/// </summary>
-		public abstract void EndCodeNames(RpcArgs args);
+		public abstract void DeactivateGameObjectsOnClient(RpcArgs args);
 
 		// DO NOT TOUCH, THIS GETS GENERATED PLEASE EXTEND THIS CLASS IF YOU WISH TO HAVE CUSTOM CODE ADDITIONS
 	}

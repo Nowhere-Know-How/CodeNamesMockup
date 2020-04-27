@@ -2,12 +2,14 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using System.Linq;
 
 public class EventManagerClient
 {
     public static OnAssignedPlayerOwnership onAssignedPlayerOwnership = new OnAssignedPlayerOwnership();
 
-    public static List<OnCardsChanged> onCardsChangedList = new List<OnCardsChanged> { 
+    //public static List<OnCardsChanged> onCardsChangedList = Enumerable.Repeat(new OnCardsChanged(), 25).ToList();
+    public static List<OnCardsChanged> onCardsChangedList = new List<OnCardsChanged> {
         new OnCardsChanged(),
         new OnCardsChanged(),
         new OnCardsChanged(),
@@ -34,8 +36,6 @@ public class EventManagerClient
         new OnCardsChanged(),
         new OnCardsChanged()
     };
-
-    //public static OnCardsChanged onCardsChanged = new OnCardsChanged();
 
     private EventManagerClient() { }
 

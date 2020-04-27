@@ -28,7 +28,7 @@ namespace CodeNames
             {
                 t = transform;
             }
-            RPCGuy playerBehavior = _manager.InstantiateNetworkBehavior(networkBehaviorName, null, t.position, t.rotation) as RPCGuy;
+            _manager.InstantiateNetworkBehavior(networkBehaviorName, null, t.position, t.rotation);
         }
 
     }

@@ -132,25 +132,6 @@ public class ForgePlayer : ForgePlayerBehavior, INetworkScenePlayer, INetworkSce
         {
             networkObject.SendRpc(RPC_SET_PLAYER_NAME, Receivers.AllBuffered, "Not a Jill");
         }
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-        }
-        //if (Input.GetKey(KeyCode.W))
-        //{
-        //    transform.position = new Vector3(1f, 1f, 1f);
-        //}
-        //else if (Input.GetKey(KeyCode.A))
-        //{
-        //    transform.position = new Vector3(1f, 1f, 2f);
-        //}
-        //else if (Input.GetKey(KeyCode.S))
-        //{
-        //    transform.position = new Vector3(1f, 1f, 3f);
-        //}
-        //else if (Input.GetKey(KeyCode.D))
-        //{
-        //    transform.position = new Vector3(1f, 1f, 4f);
-        //}
     }
 
     #endregion
