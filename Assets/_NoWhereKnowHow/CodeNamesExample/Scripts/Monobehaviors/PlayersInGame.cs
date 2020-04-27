@@ -15,6 +15,7 @@ public class PlayersInGame:MonoBehaviour
         }
         else //development
         {
+            online.Clear();
             online.Add(new Player("Arash", "male1"));
             online.Add(new Player("Josh", "female1"));
             online.Add(new Player("Brandon", "male2"));
